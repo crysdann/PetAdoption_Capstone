@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaBars } from "react-icons/fa";
 import { FaRegUser } from "react-icons/fa6";
-import PetConnect from "../assets/petconnect.png";
+import PetConnect from "../assets/images/petconnectlogo.png";
 import { IoSearch } from "react-icons/io5";
 
 const Navbar = () => {
@@ -13,7 +13,7 @@ const Navbar = () => {
   return (
     <div className="w-full min-h-[50px] flex justify-between items-center absolute z-10 sm:bg-primary-white px-4">
       <div>
-        <img src={PetConnect} alt="logo image" style={{ width: "6rem" }}></img>
+        <img src={PetConnect} alt="logo" style={{ width: "6rem" }}></img>
       </div>
       <ul className="hidden sm:flex font-bold">
         <li className="p-4 text-lg">
