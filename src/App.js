@@ -1,7 +1,7 @@
 import React from "react";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
-import Adopt from "./components/Adopt";
+import AdoptionList from "./components/Adopt";
 import LostPets from "./components/LostPets";
 import SuccessStories from "./components/SuccessStories";
 import { Routes, Route } from "react-router-dom";
@@ -13,7 +13,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="adopt" element={<Adopt />} />
+        <Route path="adopt" element={<AdoptionList />} />
         <Route path="lostpets" element={<LostPets />} />
         <Route path="successstories" element={<SuccessStories />} />
       </Routes>
