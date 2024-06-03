@@ -29,7 +29,29 @@
   .bg-primary-white {
     background-color: var(--primary-white);
   }
-  .primary-light-brown {
+  .bg-primary-light-brown {
+    background-color: var(--primary-light-brown);
+  }
+  .bg-primary-brown {
+    background-color: var(--primary-brown);
+  }
+  .bg-primary-dark {
+    background-color: var(--primary-dark);
+  }
+  .text-primary-white {
+    color: var(--primary-white);
+  }
+  .text-primary-brown {
     color: var(--primary-brown);
+  }
+  .text-dark {
+    color: var(--primary-dark);
+  }
+  .userprofiledropdown {
+    position: relative;
+  }
+  .userprofiledropdown::before {
+    content: "";
+    @apply absolute top-[-0.7rem] right-[2.1rem] w-[20px] h-[20px] bg-[#d2c8bc] transform rotate-45;
   }
 }
