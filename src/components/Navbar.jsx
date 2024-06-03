@@ -110,7 +110,7 @@ const Navbar = () => {
           <FaRegUser />
         </div>
         {profileDropdown && (
-          <div className="flex flex-col absolute top-[5rem] right-[1rem] w-[120px] rounded-2xl border-[1px] userprofiledropdown bg-primary-light-brown opacity-85">
+          <div className="flex flex-col z-10 absolute top-[5rem] right-[1rem] w-[120px] rounded-2xl border-[1px] userprofiledropdown bg-primary-light-brown opacity-85">
             <ul className="flex flex-col text-[17px]">
               <li className="p-[10px] border-b border-white hover:text-primary-white cursor-pointer">
                 Profile
