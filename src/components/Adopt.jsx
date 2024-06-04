@@ -209,7 +209,7 @@ const Paging = () => {
 
 const AdoptionList = () => {
   return (
-    <div className="pt-[9rem] pb-[2rem]">
+    <div className="pt-[9.1rem] pb-[2rem]">
       <Banner />
       <FilterPets />
       <div className="mx-7 p-5 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-8 lg:mx-14">
