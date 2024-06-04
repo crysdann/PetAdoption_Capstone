@@ -5,6 +5,7 @@ module.exports = {
     extend: {
       fontFamily: {
         josefin: ['"Josefin Sans"', "sans-serif"],
+        "dancing-script": ['"Dancing Script"', "cursive"],
       },
     },
   },

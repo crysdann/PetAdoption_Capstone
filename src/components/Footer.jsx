@@ -4,21 +4,20 @@ import { Link } from "react-router-dom";
 import { IoLocationOutline } from "react-icons/io5";
 import { LuPhone } from "react-icons/lu";
 import { MdOutlineMail } from "react-icons/md";
-import catfooter from "../assets/images/cat-1192026_640.jpg";
+import catfooter from "../assets/images/cat_footer.jpg";
 import { useForm } from "react-hook-form";
 
 const Footer = () => {
   const form = useForm();
-  const { register, handleSubmit, formState, watch } = form;
+  const { register, handleSubmit, formState } = form;
   const { errors } = formState;
-  const allFields = watch();
   const onSubmit = (data) => {
     console.log("Form submitted");
     document.getElementById("contactForm").submit();
   };
   return (
     <div>
-      <div className="w-full min-h-[150px] mt-10 bg-primary-dark text-white  sm:flex-row justify-center items-center">
+      <div className="w-full min-h-[150px] bg-primary-dark text-white  sm:flex-row justify-center items-center">
         <h1 className="sm: text-4xl flex justify-center items-center p-8">
           Contact Us
         </h1>
@@ -78,9 +77,10 @@ const Footer = () => {
                     required: { value: true, message: "Message is required" },
                   })}></textarea>
                 <p className="text-red-500">{errors.usermessage?.message}</p>
-                <button className="w-full bg-primary-light-brown p-2 rounded font-bold text-xl hover:bg-primary-brown hover:border-[#866552] hover:text-white transition duration-200">
+                {/* <button className="w-full bg-primary-light-brown p-2 rounded font-bold text-xl hover:bg-primary-brown hover:border-[#866552] hover:text-white transition duration-200">
                   Submit
-                </button>
+                </button> */}
+                <button className="w-full p-2">Submit</button>
               </form>
             </div>
           </div>

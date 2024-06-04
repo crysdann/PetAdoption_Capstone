@@ -4,6 +4,7 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
 :root {
   --primary-white: #f6f5f5;
@@ -54,4 +55,47 @@
     content: "";
     @apply absolute top-[-0.7rem] right-[2.1rem] w-[20px] h-[20px] bg-[#d2c8bc] transform rotate-45;
   }
+  button {
+    @apply block rounded text-xl bg-primary-light-brown border-[#d2c8bc] py-3 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200;
+  }
+  .custom-grid-item {
+    width: 90%;
+  }
+  .custom-grid-item:nth-child(odd) {
+    @apply ml-0;
+  }
+  .custom-grid-item:nth-child(even) {
+    @apply ml-[7.5rem];
+  }
+  .multi-line-ellipsis {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+/* pagination */
+.pagination-ul {
+  @apply flex justify-center list-none pt-[4rem];
+}
+
+.pagination-ul li {
+  @apply mt-0 mb-0 ml-[5px] mr-[5px];
+}
+
+.pagination-ul li a {
+  @apply block pt-[8px] pb-[8px] pl-[16px] pr-[16px] text-primary-brown border border-[#b4b1b1] rounded-[4px] hover:text-white transition duration-200;
+}
+
+.pagination-ul li a:hover {
+  @apply bg-primary-light-brown text-white;
+}
+
+.pagination-ul .selected a {
+  @apply bg-primary-light-brown text-white border border-[#d2c8bc];
+}
+
+.pagination-ul .disabled a {
+  @apply text-[#a5a5a5] border border-[#ddd] pointer-events-none;
 }
