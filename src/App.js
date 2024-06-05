@@ -6,6 +6,7 @@ import LostPets from "./components/LostPets";
 import SuccessStories from "./components/SuccessStories";
 import { Routes, Route } from "react-router-dom";
 import Footer from "./components/Footer";
+import PetDetails from "./components/AdoptPetDetail";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="adopt" element={<AdoptionList />} />
+        <Route path="petdetails" element={<PetDetails />} />
         <Route path="lostpets" element={<LostPets />} />
         <Route path="successstories" element={<SuccessStories />} />
       </Routes>

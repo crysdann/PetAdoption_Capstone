@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import bannerImage from "../assets/images/banner_img.jpg";
 import petimage from "../assets/images/pet2.jpg";
 import dogImg from "../assets/images/dog.png";
@@ -137,12 +138,12 @@ const PetCard = () => {
         </div>
 
         <div className="sm:flex sm:items-end sm:justify-end">
-          <a
-            href="#"
-            className="block px-5 py-3 text-center text-primary-brown  text-xs font-bold uppercase hover:text-rose-600 transition"
+          <Link
+            to="/petdetails"
+            className="block px-5 py-3 text-center text-primary-brown text-xs font-bold uppercase hover:text-rose-600 transition"
           >
             More Info...
-          </a>
+          </Link>
         </div>
       </div>
     </article>
