@@ -34,12 +34,12 @@ const SuccessStories = () => {
   return (
     <div className="bg-primary-white">
       <div className="w-full pt-[146px]">
-        <div className="max-h-[500px] relative">
-          <div className="absolute w-full h-full text-gray-200 max-h-[500px] bg-black/40 flex flex-col justify-center">
-            <h1 className="px-4 text-2xl sm:text-3xl md:text-6xl font-bold font-dancing-script">
+        <div className="max-h-[613px] relative">
+          <div className="absolute w-full h-full text-gray-200 max-h-[613px] bg-black/40 flex flex-col justify-center md:pl-[3rem] sm:pl-[2rem]">
+            <h1 className="px-4 text-5xl sm:text-5xl md:text-6xl font-bold font-dancing-script">
               Your <span>Pet Connect</span> story
             </h1>
-            <h3 className="px-4 pt-4 text-[18px] w-[30rem] sm:w-[40rem]">
+            <h3 className="px-4 pt-4 text-[18px] w-[30rem] md:w-[45rem] sm:w-[35rem]">
               Sharing your Pet Connect experience can inspire others to adopt,
               find lost pets and bring joy to their homes. Your story can show
               the positive impact and spread the joy to inspire others!
@@ -53,7 +53,7 @@ const SuccessStories = () => {
           <img
             src={successstorieshero}
             alt="success stories hero"
-            className="w-full h-[500px] object-cover"></img>
+            className="w-full h-[613px] object-cover"></img>
           {/* Image by Lenka Novotná from Pixabay
           https://pixabay.com/photos/dog-labrador-pet-canine-companion-1861839/ */}
         </div>
