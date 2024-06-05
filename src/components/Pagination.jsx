@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ReactPaginate from "react-paginate";
 import adoptedpets from "../assets/images/adoptedpets.png";
+import { Link } from "react-router-dom";
 
 function Items({ currentItems }) {
   return (
@@ -10,12 +11,12 @@ function Items({ currentItems }) {
           <div
             className="rounded-xl relative md:custom-grid-item h-[200px]"
             key={index}>
-            <div className="bg-white shadow-md text-[#5e5e5b] grid grid-cols-4 cursor-pointer transform transition-transform duration-300 hover:scale-105 h-full">
+            <div className="bg-white shadow-md text-[#5e5e5b] grid grid-cols-4 cursor-pointer transform transition-transform duration-300 hover:scale-105">
               <div className="col-span-2 md:col-span-1 flex">
                 <img
                   src={adoptedpets}
                   alt="adoptedPets"
-                  className="w-full h-full object-cover"
+                  className="w-full object-cover"
                 />
               </div>
               <div className="col-span-2 md:col-span-3 flex flex-col h-full overflow-hidden">
@@ -25,11 +26,11 @@ function Items({ currentItems }) {
                 <p className="pl-[1rem] pr-[1rem] multi-line-ellipsis">
                   {item.story}
                 </p>
-                <a
-                  href="#"
+                <Link
+                  to="/SuccessStoriesNarratives"
                   className="flex justify-end text-primary-brown font-bold pt-[0.5rem] pr-[1rem] pb-[1rem] hover:text-rose-600">
                   view more...
-                </a>
+                </Link>
               </div>
             </div>
           </div>
