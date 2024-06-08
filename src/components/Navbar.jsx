@@ -56,6 +56,11 @@ const Navbar = () => {
               Success Stories
             </Link>
           </li>
+          <li className="p-4 text-lg">
+            <Link to="/login" className="hover:text-primary-brown">
+              Login
+            </Link>
+          </li>
         </ul>
         <div className="flex items-center p-4 space-x-4 ml-auto sm:ml-0">
           <div className="sm:hidden">
@@ -83,6 +88,9 @@ const Navbar = () => {
             </li>
             <li className="p-4 text-2xl py-8" onClick={handleNav}>
               <Link to="/successstories">Success Stories</Link>
+            </li>
+            <li className="p-4 text-2xl py-8" onClick={handleNav}>
+              <Link to="/login"> Login </Link>
             </li>
           </ul>
         </div>

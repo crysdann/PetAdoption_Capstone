@@ -1,0 +1,69 @@
+.login-body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color:#262721;
+    height: 100vh;
+  }
+  
+  .snowflake {
+    position: fixed;
+    top: -10px; 
+    background-color: white;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    animation: falling linear infinite;
+    pointer-events: none; 
+  }
+  
+  @keyframes falling {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(100vh); /* Drop to the bottom of the viewport */
+    }
+  }
+  
+  /* Additional form animations */
+.form-container {
+    background-color: white; /* Form background color */
+    border: 1px solid gray; /* Form border */
+    padding: 20px;
+    animation: fadeIn 2s ease-in-out;
+  }
+
+.input-white-focus:focus {
+    border-color: white;
+    outline: none; 
+  }
+  
+  
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @media (max-width: 640px) { 
+    .login-body .flex-wrap {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .login-body .flex-wrap > div {
+      width: 100%;
+      text-align: center;
+    }
+  
+    .login-body .flex-wrap > div:first-child {
+      margin-bottom: 1rem;
+    }
+  }
+  
