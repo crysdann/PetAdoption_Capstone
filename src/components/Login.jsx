@@ -1,0 +1,106 @@
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import Sign_in1 from "../assets/images/signin_img.jpg";
+import "../style.css"; 
+
+const Login = () => {
+  const { register, handleSubmit, formState: { errors } } = useForm();
+  
+  useEffect(() => {
+    function createSnowflake() {
+      const snowflake = document.createElement('div');
+      snowflake.classList.add('snowflake');
+      snowflake.style.left = Math.random() * window.innerWidth + 'px';
+      snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
+      snowflake.style.animationDelay = Math.random() * 2 + 's';
+      document.body.appendChild(snowflake);
+
+      setTimeout(() => {
+          snowflake.remove();
+      }, 5000);
+    }
+
+    const interval = setInterval(createSnowflake, 100);
+
+    return () => clearInterval(interval); // Cleanup function to remove interval when component unmounts
+  }, []); // Empty dependency array ensures the effect runs only once when the component mounts
+
+  const onSubmit = async (data) => {
+    console.log("Form submitted", data);
+  };
+
+  return (
+    <div className='login-body'>
+      <section className="relative flex flex-wrap lg:h-98 lg:items-center border border-gray-300 mx-auto max-w-5xl mt-20 mb-10 ml-30 mr-30 font-josefin form-container">
+        <div className="w-full px-4 py-12 sm:px-6 sm:py-12 lg:w-1/2 lg:px-8 lg:py-16">
+          <div className="mx-auto max-w-lg text-center">
+            <h1 className="text-2xl font-bold primary-brown sm:text-3xl">Log In Now</h1>
+          </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="mx-auto mb-0 mt-8 max-w-md space-y-4">
+            <div>
+              <label htmlFor="email" className="sr-only">Email</label>
+              <div className="relative">
+                <input
+                  type="email"
+                  className={`w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm custom-input input-white-focus ${errors.email ? 'border-red-500' : ''}`}
+                  placeholder="Enter email"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /\S+@\S+\.\S+/,
+                      message: "Entered value does not match email format"
+                    }
+                  })}
+                />
+                <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                  </svg>
+                </span>
+              </div>
+              <p className="text-red-500">{errors.email?.message}</p>
+            </div>
+            <div>
+              <label htmlFor="password" className="sr-only">Password</label>
+              <div className="relative">
+                <input
+                  type="password"
+                  className={`w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm custom-input input-white-focus ${errors.password ? 'border-red-500' : ''}`}
+                  placeholder="Enter password"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: { value: 6, message: "Password must be at least 6 characters" }
+                  })}
+                />
+                <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </span>
+              </div>
+              <p className="text-red-500">{errors.password?.message}</p>
+            </div>
+            <div className="flex items-center justify-between flex-wrap">
+              <div className="w-full text-center mb-2 sm:mb-0 sm:w-auto">
+                <button type="submit" className="inline-block rounded-lg bg-primary-brown px-5 py-3 text-sm font-medium text-white">
+                  Sign in
+                </button>
+              </div>
+              <div className="w-full text-center sm:w-auto">
+                <p className="text-sm text-gray-500">No account?&nbsp;
+                  <a className="underline" href="Signup">Sign up</a>
+                </p>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div className="relative w-full sm:h-96 lg:w-1/2">
+          <img src={Sign_in1} alt="login" className="h-full w-full object-cover" />
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Login;
