@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from "react-router-dom";
 
 
 const UserProfile = () => {
@@ -212,9 +213,9 @@ const UserProfile = () => {
                                 <div className="md:w-[88%] xs:w-[92%] px-4 py-6">
                                     <div className="flex items-center  mb-4">
                                         <p className="text-lg text-gray-700 mr-3">Want to post any pets for adoption...  </p>
-                                        <a href="/add-adoption" className="inline-block rounded text-lg bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200">
+                                        <Link to="/adoptdataform" className="inline-block rounded text-lg bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200">
                                             Add Adoption
-                                        </a>
+                                        </Link>
                                     </div>
                                     <div className="grid grid-cols-1 gap-4 mt-8">
                                         {hasPostedAdoption ? (
