@@ -9,6 +9,7 @@ import catImg from "../assets/images/cat.png";
 import allPetImg from "../assets/images/all_pet.png";
 import otherPetImg from "../assets/images/other_pet.png";
 
+
 const LostPetPage = () => {
   const petData = [
     {
@@ -71,7 +72,7 @@ const LostPetPage = () => {
             </p>
             <div className="mt-8 flex justify-center">
               <a
-                href="#"
+                href="lostpetform"
                 className="block w-full rounded bg-rose-600 px-12 py-3 text-sm font-medium text-white shadow hover:bg-rose-700 focus:outline-none focus:ring active:bg-rose-500 sm:w-auto"
               >
                 Find Your Pet
