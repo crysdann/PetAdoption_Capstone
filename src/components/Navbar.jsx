@@ -73,9 +73,8 @@ const Navbar = () => {
         </div>
         {/* Mobile Menu */}
         <div
-          className={`${
-            nav ? "left-0" : "left-[-100%]"
-          } overflow-y-hidden md:hidden ease-in duration-300 absolute text-gray-300 top-0 w-full h-screen bg-black/90 py-7 flex flex-col`}>
+          className={`${nav ? "left-0" : "left-[-100%]"
+            } overflow-y-hidden md:hidden ease-in duration-300 absolute text-gray-300 top-0 w-full h-screen bg-black/90 py-7 flex flex-col`}>
           <ul className="h-full w-full text-center pt-12">
             <li className="p-4 text-2xl py-8" onClick={handleNav}>
               <Link to="/">Home</Link>
@@ -121,7 +120,8 @@ const Navbar = () => {
           <div className="flex flex-col z-10 absolute top-[5rem] right-[1rem] w-[120px] rounded-2xl border-[1px] userprofiledropdown bg-primary-light-brown opacity-85">
             <ul className="flex flex-col text-[17px]">
               <li className="p-[10px] border-b border-white hover:text-primary-white cursor-pointer">
-                Profile
+                <Link to="/UserProfile">Profile</Link>
+
               </li>
               <li className="p-[10px] border-b border-white hover:text-primary-white cursor-pointer">
                 Settings
