@@ -13,6 +13,7 @@ import Login from "./components/Login";
 import { useLocation } from "react-router-dom";
 import Signup from "./components/Signup";
 import UserProfile from "./components/UserProfile";
+import AdoptForm from "./components/AdoptionDataForm";
 
 function App() {
   const location = useLocation();
@@ -35,6 +36,7 @@ function App() {
         />
         <Route path="lostpetform" element={<LostPetForm />} />
         <Route path="UserProfile" element={<UserProfile />} />
+        <Route path="adoptdataform" element={<AdoptForm/>}/>
       </Routes>
       {!isLoginPage && <Footer />}
     </>
