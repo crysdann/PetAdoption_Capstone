@@ -1,6 +1,7 @@
 import React from "react";
 import successstorieshero from "../assets/images/successstorieshero.jpg";
 import Pagination from "../components/Pagination";
+import { Link } from "react-router-dom";
 
 const successStoriesData = [
   {
@@ -44,11 +45,11 @@ const SuccessStories = () => {
               find lost pets and bring joy to their homes. Your story can show
               the positive impact and spread the joy to inspire others!
             </h3>
-            <a
-              href="#"
+            <Link
+              to="/SuccessStoriesForm"
               className="ml-[16px] mt-[2rem] text-md block w-[15rem] rounded bg-rose-600 px-12 py-3 font-medium text-white shadow hover:bg-rose-700 focus:outline-none focus:ring active:bg-rose-500">
               Share your story
-            </a>
+            </Link>
           </div>
           <img
             src={successstorieshero}

@@ -14,6 +14,7 @@ import { useLocation } from "react-router-dom";
 import Signup from "./components/Signup";
 import UserProfile from "./components/UserProfile";
 import AdoptForm from "./components/AdoptionDataForm";
+import SuccessStoriesForm from "./components/SuccessStoriesForm";
 
 function App() {
   const location = useLocation();
@@ -36,7 +37,8 @@ function App() {
         />
         <Route path="lostpetform" element={<LostPetForm />} />
         <Route path="UserProfile" element={<UserProfile />} />
-        <Route path="adoptdataform" element={<AdoptForm/>}/>
+        <Route path="adoptdataform" element={<AdoptForm />} />
+        <Route path="successstoriesform" element={<SuccessStoriesForm />} />
       </Routes>
       {!isLoginPage && <Footer />}
     </>
