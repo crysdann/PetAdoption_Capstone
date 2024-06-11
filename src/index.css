@@ -99,3 +99,14 @@
 .pagination-ul .disabled a {
   @apply text-[#a5a5a5] border border-[#ddd] pointer-events-none;
 }
+
+.dt-text {
+  border-bottom: 1px solid #D1D5DB; 
+  width: 600px; 
+}
+.grayscale {
+  filter: grayscale(20%);
+}
+.text-shadows{
+  text-shadow: "4px 4px 8px rgba(0, 0, 0, 0.5)"
+}

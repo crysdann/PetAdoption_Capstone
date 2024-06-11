@@ -15,6 +15,7 @@ import Signup from "./components/Signup";
 import UserProfile from "./components/UserProfile";
 import AdoptForm from "./components/AdoptionDataForm";
 import SuccessStoriesForm from "./components/SuccessStoriesForm";
+import Adminprofile from "./components/Adminprofile";
 
 function App() {
   const location = useLocation();
@@ -39,6 +40,8 @@ function App() {
         <Route path="UserProfile" element={<UserProfile />} />
         <Route path="adoptdataform" element={<AdoptForm />} />
         <Route path="successstoriesform" element={<SuccessStoriesForm />} />
+        <Route path="adminprofile" element={<Adminprofile/>}/>
+
       </Routes>
       {!isLoginPage && <Footer />}
     </>
