@@ -1,0 +1,36 @@
+type Pet {
+  _id: ID!
+  user_id: ID!
+  pet_name: String!
+  pet_type: String!
+  pet_age: Int!
+  pet_gender: String!
+  vaccination_details: String
+  health_issues: String
+  pet_behaviour: String
+  pet_description: String
+  pet_image: String
+  pet_video: String
+}
+
+type Query {  
+  getAllPets: [Pet]
+}
+
+type Mutation {
+  createPet(
+    user_id: ID!
+    pet_name: String!
+    pet_type: String!
+    pet_age: Int!
+    pet_gender: String!
+    vaccination_details: String
+    health_issues: String
+    pet_behaviour: String
+    pet_description: String
+    pet_image: String
+    pet_video: String
+  ): Pet
+
+  
+}
