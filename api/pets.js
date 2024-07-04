@@ -1,7 +1,7 @@
 const { getDb, getCurrentPetCount } = require("./db");
 
-//creating new pet record
-async function createPet(_, { pet }) {
+///creating new pet record
+async function createPet(_, { pet}) {
   try {
     const db = getDb();
     //get the current pet count from counters
@@ -19,7 +19,24 @@ async function createPet(_, { pet }) {
   }
 }
 
+async function insertImg(_, { img }) {
+  try {
+    const db = getDb();   
+    // Insert image data into MongoDB
+    const newImg = await db.collection("images").insertOne(img);
+    console.log("Image inserted successfully:", newImg.insertedId);
+
+    // Retrieve the inserted image from MongoDB
+    const insertedImage = await db.collection("images").findOne({ _id: newImg.insertedId });
+    return insertedImage;
+  } catch (err) {
+    console.error("Error inserting image:", err);
+    throw err; // Throw the error to be caught by GraphQL
+  }
+}
+
+
 //export modules
 module.exports = {
-  createPet,
+  createPet,insertImg
 };

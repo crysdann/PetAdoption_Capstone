@@ -1,53 +1,183 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import graphQLFetch from "../graphQLFetch";
+import firebase from "firebase/compat/app";
+import "firebase/compat/storage";
+
 const AdoptForm = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
   } = useForm();
-  const allFields = watch();
-  const onSubmit = (data) => {
-    console.log("Form submitted", data);
+
+  const onSubmit = async (data) => {
+    console.log("data", data);
+    try {
+      let files = data.floating_pet_image;
+
+      // Ensure files is an array
+      if (!Array.isArray(files)) {
+        files = Array.from(files); // Convert to array using Array.from()
+      }
+
+      const images = [];
+      const query = `
+      mutation {
+        createPet(pet: {
+          user_id: 1,
+          pet_name: "${data.floating_pet_name}",
+          pet_type: "${data.floating_pet_type}",
+          pet_age: ${data.floating_pet_age},
+          pet_gender: "${data.floating_pet_gender}",
+          vaccination_details: "${data.floating_vaccination_details || ""}",
+          health_issues: "${data.floating_health_issues || ""}",
+          pet_behaviour: "${data.floating_pet_behaviour || ""}",
+          pet_description: "${data.floating_pet_description || ""}",
+          pet_video: ""
+        }) {
+          _id
+          user_id
+          pet_name
+          pet_type
+          pet_age
+          pet_gender
+          vaccination_details
+          health_issues
+          pet_behaviour
+          pet_description      
+          pet_video
+        }
+      }
+    `;
+
+      const response = await graphQLFetch(query);
+
+      if (!response || !response.createPet) {
+        throw new Error("Failed to create pet.");
+      }
+
+      const petId = response.createPet._id;
+
+      // Upload images and insert their URLs in batches
+      const uploadPromises = files.map(async (selectedFile) => {
+        if (selectedFile) {
+          const storageRef = firebase.storage().ref();
+          const fileRef = storageRef.child(selectedFile.name);
+
+          try {
+            const snapshot = await fileRef.put(selectedFile);
+            const downloadURL = await snapshot.ref.getDownloadURL();
+
+            // Store the image URL in the images array
+            images.push(downloadURL);
+          } catch (error) {
+            console.error("Error uploading file:", error);
+            throw new Error("Failed to upload file.");
+          }
+        } else {
+          console.log("No file selected.");
+        }
+      });
+
+      // Wait for all file uploads to complete
+      await Promise.all(uploadPromises);
+
+      // Insert image URLs into the database in batches
+      const insertPromises = images.map(async (imageUrl) => {
+        const insertImgQuery = `
+          mutation InsertImage($img: ImageInput!) {
+            insertImg(img: $img) {
+              _id
+              petId
+              url
+            }
+          }
+        `;
+
+        const insertImgVariables = {
+          img: {
+            petId: petId,
+            url: imageUrl,
+          },
+        };
+
+        const insertImgResponse = await graphQLFetch(
+          insertImgQuery,
+          insertImgVariables
+        );
+
+        if (!insertImgResponse || !insertImgResponse.insertImg) {
+          console.error("Failed to insert image:", insertImgResponse);
+          throw new Error("Failed to insert image.");
+        }
+      });
+
+      // Wait for all database insertions to complete
+      await Promise.all(insertPromises);
+
+      // Handle success
+      alert("Pet and images successfully registered for adoption.");
+    } catch (error) {
+      console.error("Error registering pet and images:", error);
+      alert("Failed to register pet and images for adoption.");
+    }
   };
+
   return (
     <div className="pt-[12rem] pb-[2rem] mx-9 sm:mx-15">
       <h1 className="flex justify-center pt-4 pb-2 text-[2rem] sm:text-[3rem] font-bold text-[#644b3c] ">
         Register pets for adoption
       </h1>
-      <form className="max-w-3xl mx-auto bg-white shadow-md rounded px-8 pt-8 pb-8">
+      <form
+        className="max-w-3xl mx-auto bg-white shadow-md rounded px-8 pt-8 pb-8"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <div className="grid md:grid-cols-2 md:gap-6">
           <div className="relative z-0 w-full mb-5 group">
             <input
               type="text"
-              name="floating_first_name"
-              id="floating_first_name"
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              id="floating_pet_name"
+              className={`block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-b-2 border-gray-300 focus:border-gray-900 ${
+                errors.floating_pet_name ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder=" "
-              required
+              {...register("floating_pet_name", {
+                required: "Pet name is required",
+              })}
             />
             <label
-              htmlFor="floating_first_name"
-              className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              htmlFor="floating_pet_name"
+              className="peer-focus:font-large absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
               Pet name
             </label>
+            {errors.floating_pet_name && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.floating_pet_name.message}
+              </p>
+            )}
           </div>
           <div className="relative z-0 w-full mb-5 group">
             <select
-              name="floating_pet_type"
               id="floating_pet_type"
-              className="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              required
+              className={`block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+                errors.floating_pet_type ? "border-red-500" : ""
+              }`}
+              {...register("floating_pet_type", {
+                required: "Pet type is required",
+              })}
             >
-              <option value="" selected>
-                Select Pet type
-              </option>
+              <option value="">Select Pet type</option>
               <option value="dog">Dog</option>
               <option value="cat">Cat</option>
               <option value="other">Other</option>
             </select>
+            {errors.floating_pet_type && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.floating_pet_type.message}
+              </p>
+            )}
           </div>
         </div>
 
@@ -55,113 +185,169 @@ const AdoptForm = () => {
           <div className="relative z-0 w-full mb-5 group">
             <input
               type="number"
-              name="floating_pet_age"
               id="floating_pet_age"
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+                errors.floating_pet_age ? "border-red-500" : ""
+              }`}
               placeholder=" "
-              required
+              {...register("floating_pet_age", {
+                required: "Pet age is required",
+                min: { value: 0, message: "Age must be a positive number" },
+              })}
             />
             <label
               htmlFor="floating_pet_age"
-              className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
               Pet age
             </label>
+            {errors.floating_pet_age && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.floating_pet_age.message}
+              </p>
+            )}
           </div>
           <div className="relative z-0 w-full mb-5 group">
             <select
-              name="floating_pet_gender"
               id="floating_pet_gender"
-              className="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              required
+              className={`block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+                errors.floating_pet_gender ? "border-red-500" : ""
+              }`}
+              {...register("floating_pet_gender", {
+                required: "Pet gender is required",
+              })}
             >
-              <option value="" selected>
-                Select Pet gender
-              </option>
+              <option value="">Select Pet gender</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
             </select>
+            {errors.floating_pet_gender && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.floating_pet_gender.message}
+              </p>
+            )}
           </div>
         </div>
 
         <div className="relative z-0 w-full mb-5 group">
           <textarea
-            name="floating_vaccination_details"
             id="floating_vaccination_details"
-            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            className={`block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+              errors.floating_vaccination_details ? "border-red-500" : ""
+            }`}
             placeholder=" "
-            required
+            {...register("floating_vaccination_details", {
+              required: "Vaccination details are required",
+            })}
           ></textarea>
           <label
             htmlFor="floating_vaccination_details"
-            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
             Vaccination details
           </label>
+          {errors.floating_vaccination_details && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.floating_vaccination_details.message}
+            </p>
+          )}
         </div>
 
         <div className="relative z-0 w-full mb-5 group">
           <textarea
-            name="floating_health_issues"
             id="floating_health_issues"
-            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            className={`block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+              errors.floating_health_issues ? "border-red-500" : ""
+            }`}
             placeholder=" "
-            required
+            {...register("floating_health_issues", {
+              required: "Health issues are required",
+            })}
           ></textarea>
           <label
             htmlFor="floating_health_issues"
-            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
             Health issues
           </label>
+          {errors.floating_health_issues && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.floating_health_issues.message}
+            </p>
+          )}
         </div>
 
         <div className="relative z-0 w-full mb-5 group">
           <textarea
-            name="floating_pet_behaviour"
             id="floating_pet_behaviour"
-            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            className={`block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+              errors.floating_pet_behaviour ? "border-red-500" : ""
+            }`}
             placeholder=" "
-            required
+            {...register("floating_pet_behaviour", {
+              required: "Pet behaviour is required",
+            })}
           ></textarea>
           <label
             htmlFor="floating_pet_behaviour"
-            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
             Pet behaviour
           </label>
+          {errors.floating_pet_behaviour && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.floating_pet_behaviour.message}
+            </p>
+          )}
         </div>
 
         <div className="relative z-0 w-full mb-5 group">
           <textarea
-            name="floating_pet_description"
             id="floating_pet_description"
-            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            className={`block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+              errors.floating_pet_description ? "border-red-500" : ""
+            }`}
             placeholder=" "
-            required
+            {...register("floating_pet_description", {
+              required: "Pet description is required",
+            })}
           ></textarea>
           <label
             htmlFor="floating_pet_description"
-            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
             Pet description
           </label>
+          {errors.floating_pet_description && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.floating_pet_description.message}
+            </p>
+          )}
         </div>
 
         <div className="relative z-0 w-full mb-5 group">
           <input
             type="file"
-            name="floating_pet_image"
             id="floating_pet_image"
-            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-            required
+            className={`block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+              errors.floating_pet_image ? "border-red-500" : ""
+            }`}
+            {...register("floating_pet_image", {
+              required: "Pet image is required",
+            })}
+            multiple
           />
           <label
             htmlFor="floating_pet_image"
-            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
             Pet image
           </label>
+          {errors.floating_pet_image && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.floating_pet_image.message}
+            </p>
+          )}
         </div>
 
         <button
