@@ -1,15 +1,16 @@
-const fs = require('fs');
-const { ApolloServer } = require('apollo-server-express');
-const { createPet,insertImg,getAllPets } = require('./pets.js');
-require('dotenv').config();
+const fs = require("fs");
+const { ApolloServer } = require("apollo-server-express");
+const { createPet, insertImg, getAllPets } = require("./pets.js");
+require("dotenv").config();
 
-const resolvers = {  
+const resolvers = {
   Query: {
-    getAllPets:getAllPets,
+    getAllPets: getAllPets,
   },
   Mutation: {
-    createPet:createPet,
-    insertImg:insertImg
+    createPet: createPet,
+    insertImg: insertImg,
+    createSuccessStory: createSuccessStory,
   },
 };
 
@@ -24,4 +25,3 @@ function installHandler(app) {
 }
 
 module.exports = { installHandler };
-  
