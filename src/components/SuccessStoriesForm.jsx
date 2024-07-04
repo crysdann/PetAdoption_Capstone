@@ -1,15 +1,18 @@
 import React, { useState } from "react";
+import graphQLFetch from "../graphQLFetch";
 
 const SuccessStoriesForm = () => {
   const [petName, setPetName] = useState("");
-  const [petPhoto, setPetPhoto] = useState("");
+  // const [petPhoto, setPetPhoto] = useState(null);
   const [description, setDescription] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form submitted!");
     console.log("Pet Name:", petName);
-    console.log("Pet Photo:", petPhoto);
+    // console.log("Pet Photo:", petPhoto);
     console.log("Description:", description);
 
     const query = `
@@ -23,22 +26,18 @@ const SuccessStoriesForm = () => {
     `;
 
     try {
-      const response = await fetch("http://localhost:4000/graphql", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          query: query,
-        }),
-      });
+      const response = await graphQLFetch(query);
 
-      const result = await response.json();
+      console.log("GraphQL Response:", response);
+
       setPetName("");
-      setPetPhoto("");
       setDescription("");
+      setSuccessMessage("Success story added!");
+      setErrorMessage("");
     } catch (error) {
       console.error("Error adding success story:", error);
+      setErrorMessage("Error adding success story: " + error.message);
+      setSuccessMessage("");
     }
   };
 
@@ -48,6 +47,14 @@ const SuccessStoriesForm = () => {
         Share your Success Story
       </h1>
       <div className="max-w-xl mx-auto mt-8 mb-16 p-4 bg-white rounded-lg shadow-md">
+        {successMessage && (
+          <div className="mb-4 text-green-600 text-center">
+            {successMessage}
+          </div>
+        )}
+        {errorMessage && (
+          <div className="mb-4 text-red-600 text-center">{errorMessage}</div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
@@ -73,8 +80,8 @@ const SuccessStoriesForm = () => {
             <input
               type="file"
               id="petPhoto"
-              accept="image/*"
-              onChange={(e) => setPetPhoto(e.target.files[0])}
+              // accept="image/*"
+              // onChange={(e) => setPetPhoto(e.target.files[0])}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring focus:ring-primary-blue"
               // required
             />
