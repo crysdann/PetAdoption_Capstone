@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import bannerImage from "../assets/images/banner_img.jpg";
 import petimage from "../assets/images/pet2.jpg";
 import dogImg from "../assets/images/dog.png";
@@ -58,8 +60,8 @@ function FilterPets() {
     <div className="container mx-auto mt-8 flex justify-center">
       <div className="flex flex-wrap -m-2 justify-center w-7/12">
         <div className="w-full sm:w-1/2 md:w-1/4 p-2">
-          <a
-            href="#"
+          <Link
+            to="/adopt/all"
             className="block p-4 shadow text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
           >
             <img
@@ -68,11 +70,11 @@ function FilterPets() {
               style={{ width: "4rem" }}
             ></img>
             <span className="mt-1 font-bold">All Pets</span>
-          </a>
+          </Link>
         </div>
         <div className="w-full sm:w-1/2 md:w-1/4 p-2">
-          <a
-            href="#"
+          <Link
+            to="/adopt/dog"
             className="block p-6 shadow  text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
           >
             <img
@@ -81,11 +83,11 @@ function FilterPets() {
               style={{ width: "4rem" }}
             ></img>
             <span className="font-bold">Dogs</span>
-          </a>
+          </Link>
         </div>
         <div className="w-full sm:w-1/2 md:w-1/4 p-2">
-          <a
-            href="#"
+          <Link
+            to="/adopt/cat"
             className="block p-6 shadow  text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
           >
             <img
@@ -94,11 +96,11 @@ function FilterPets() {
               style={{ width: "4rem" }}
             ></img>
             <span className="font-bold">Cats</span>
-          </a>
+          </Link>
         </div>
         <div className="w-full sm:w-1/2 md:w-1/4 p-2">
-          <a
-            href="#"
+          <Link
+            to="/adopt/other"
             className="block p-6 shadow  text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
           >
             <img
@@ -107,7 +109,7 @@ function FilterPets() {
               style={{ width: "4rem" }}
             ></img>
             <span className="font-bold">Others</span>
-          </a>
+          </Link>
         </div>
       </div>
     </div>
@@ -196,13 +198,14 @@ const Paging = ({ items, itemsPerPage }) => {
     </>
   );
 };
-
 const AdoptionList = () => {
   const [pets, setPets] = useState([]);
+  const { filter } = useParams();
+  const [filteredPets, setFilteredPets] = useState([]);
+  const navigate = useNavigate();
   const itemsPerPage = 6;
 
   useEffect(() => {
-    // Fetch pets data using graphQLFetch
     const fetchPets = async () => {
       const query = `
         query {
@@ -225,27 +228,43 @@ const AdoptionList = () => {
 
       try {
         const data = await graphQLFetch(query);
-        if (data && data.getAllPets) {
-          setPets(data.getAllPets);
-          console.log(data);
+        if (!data || !data.getAllPets) {
+          console.error("Error fetching pets");
+          throw new Error("Failed to fetch pet details.");
         }
+
+        setPets(data.getAllPets);
+
+        let filtered = [];
+        if (!filter || filter === "all") {
+          filtered = data.getAllPets;
+        } else {
+          filtered = data.getAllPets.filter(
+            (pet) => pet.pet_type.toLowerCase() === filter.toLowerCase()
+          );
+        }
+        setFilteredPets(filtered);
       } catch (error) {
         console.error("Error fetching pets:", error);
       }
     };
 
     fetchPets();
-  }, []);
+  }, [filter]);
+
+  useEffect(() => {
+    if(filter)
+       navigate(`/adopt/${filter}`);
+  }, [filter, navigate]);
 
   return (
     <div className="pt-[9.1rem] pb-[2rem]">
       <Banner />
       <FilterPets />
       <div className="mx-7 p-5 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-8 lg:mx-14">
-        <Paging items={pets} itemsPerPage={itemsPerPage} />
+        <Paging items={filteredPets} itemsPerPage={itemsPerPage} />
       </div>
     </div>
   );
 };
-
 export default AdoptionList;
