@@ -23,6 +23,7 @@ type SuccessStory {
   id: ID!
   petName: String!
   description: String!
+  petPhotoUrl: String!
 }
 
 type LostPet {
@@ -78,7 +79,10 @@ type Query {
 type Mutation {
   createPet(pet: petInput!): Pet!
   insertImg(img: ImageInput!): Image!
-  createSuccessStory(petName: String!, description: String!): SuccessStory!
+  createSuccessStory(
+    petName: String!
+    description: String!
+    petPhotoUrl: String!
+  ): SuccessStory!
   addLostPet(input: LostPetInput!): LostPet!
-
 }

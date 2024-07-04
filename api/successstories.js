@@ -1,17 +1,13 @@
+const { ObjectId } = require("mongodb");
 const { getDb } = require("./db");
 
-// Creating a new success story record
-async function createSuccessStory(_, { petName, description }) {
+async function createSuccessStory(_, { petName, description, petPhotoUrl }) {
   try {
     const db = getDb();
-
-    // createSuccessStory.id = await getCurrentPetCount("successStories");
-    // createPet.id = await getCurrentPetCount("pets");
-
-    // Insert success story data
     const newSuccessStory = await db.collection("successStories").insertOne({
       petName,
       description,
+      petPhotoUrl,
     });
 
     console.log(
@@ -19,18 +15,21 @@ async function createSuccessStory(_, { petName, description }) {
       newSuccessStory.insertedId
     );
 
-    const insertedSuccessStory = await db
-      .collection("successStories")
-      .findOne({ _id: newSuccessStory.insertedId });
+    const insertedSuccessStory = await db.collection("successStories").findOne({
+      _id: newSuccessStory.insertedId,
+    });
+
+    // Transform MongoDB _id to GraphQL id
+    insertedSuccessStory.id = insertedSuccessStory._id.toString();
+    delete insertedSuccessStory._id;
 
     return insertedSuccessStory;
   } catch (err) {
     console.error("Error in success story insert:", err);
-    throw err; // Throw the error to be caught by the GraphQL resolver
+    throw err;
   }
 }
 
-// Export modules
 module.exports = {
   createSuccessStory,
 };
