@@ -12,7 +12,10 @@ let db;
 async function connectToDb() {
   try {
     //Create client
-    const client = new MongoClient(DB_URL, { useNewURLParser: true });
+    const client = new MongoClient(DB_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     //Connect to the client (await)
     await client.connect();
     //Return connection client.db

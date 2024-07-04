@@ -5,15 +5,41 @@ const SuccessStoriesForm = () => {
   const [petPhoto, setPetPhoto] = useState("");
   const [description, setDescription] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form submitted!");
     console.log("Pet Name:", petName);
     console.log("Pet Photo:", petPhoto);
     console.log("Description:", description);
-    setPetName("");
-    setPetPhoto("");
-    setDescription("");
+
+    const query = `
+      mutation {
+        createSuccessStory(petName: "${petName}", description: "${description}") {
+          id
+          petName
+          description
+        }
+      }
+    `;
+
+    try {
+      const response = await fetch("http://localhost:4000/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: query,
+        }),
+      });
+
+      const result = await response.json();
+      setPetName("");
+      setPetPhoto("");
+      setDescription("");
+    } catch (error) {
+      console.error("Error adding success story:", error);
+    }
   };
 
   return (
@@ -50,7 +76,7 @@ const SuccessStoriesForm = () => {
               accept="image/*"
               onChange={(e) => setPetPhoto(e.target.files[0])}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring focus:ring-primary-blue"
-              required
+              // required
             />
           </div>
           <div className="mb-4">
