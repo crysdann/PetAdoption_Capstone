@@ -45,7 +45,8 @@ const AdoptForm = () => {
           vaccination_details
           health_issues
           pet_behaviour
-          pet_description      
+          pet_description   
+          pet_image   
           pet_video
         }
       }

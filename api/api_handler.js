@@ -1,12 +1,12 @@
 const fs = require('fs');
 const { ApolloServer } = require('apollo-server-express');
-const { createPet,insertImg } = require('./pets.js');
+const { createPet,insertImg,getAllPets } = require('./pets.js');
 require('dotenv').config();
 
 const resolvers = {  
-  // Query: {
-  //   getAllPets:getAllPets,
-  // },
+  Query: {
+    getAllPets:getAllPets,
+  },
   Mutation: {
     createPet:createPet,
     insertImg:insertImg

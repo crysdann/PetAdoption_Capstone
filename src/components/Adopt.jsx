@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import bannerImage from "../assets/images/banner_img.jpg";
 import petimage from "../assets/images/pet2.jpg";
@@ -6,6 +6,7 @@ import dogImg from "../assets/images/dog.png";
 import catImg from "../assets/images/cat.png";
 import allPetImg from "../assets/images/all_pet.png";
 import otherPetImg from "../assets/images/other_pet.png";
+import graphQLFetch from "../graphQLFetch";
 
 function Banner() {
   return (
@@ -112,34 +113,39 @@ function FilterPets() {
   );
 }
 
-const PetCard = () => {
+const PetCard = ({ pet }) => {
+  const { pet_name, pet_age, pet_gender, pet_description, pet_image } = pet;
+
+  // Use the first image URL if available, otherwise use a placeholder image
+  const petImageUrl =
+    pet_image && pet_image.length > 0 ? pet_image[0] : petimage;
+
+  console.log("firstimage", petImageUrl);
+
   return (
     <article className="flex flex-col xl:flex-row bg-white transition hover:shadow-xl">
       <div className="sm:block sm:basis-56">
         <img
           alt="pet_image"
-          src={petimage}
+          src={petImageUrl}
           className="aspect-square h-full w-full object-cover"
         />
       </div>
 
       <div className="flex flex-1 flex-col justify-between">
         <div className="border-s border-gray-900/10 p-4 sm:border-l-transparent sm:p-6">
-          <h3 className="font-bold uppercase text-gray-900">Jagger</h3>
-          <p className="text-sm font-bold text-dark ">Age: 3yrs</p>
-          <p className="text-sm font-bold text-dark ">Male</p>
+          <h3 className="font-bold uppercase text-gray-900">{pet_name}</h3>
+          <p className="text-sm font-bold text-dark">Age: {pet_age} yrs</p>
+          <p className="text-sm font-bold text-dark">Gender: {pet_gender}</p>
 
-          <p className="mt-2 text-md/relaxed text-gray-700">
-            Jagger is an 8 year old border collie / husky cross. He is 60 lbs of
-            short creamy white fur with a striking dappled red nose & ears. He
-            has a truly goofy grin when he’s happy and his expressive toffee
-            brown eyes make it hard to stay mad at him for any length of time.
+          <p className="mt-2 text-md/relaxed text-gray-700 line-clamp-4">
+            {pet_description}
           </p>
         </div>
 
         <div className="sm:flex sm:items-end sm:justify-end">
           <Link
-            to="/petdetails"
+            to={`/petdetails/${pet._id}`}
             className="block px-5 py-3 text-center text-primary-brown text-xs font-bold uppercase hover:text-rose-600 transition"
           >
             More Info...
@@ -165,7 +171,7 @@ const Paging = () => {
           fill="currentColor"
         >
           <path
-            fill-rule="evenodd"
+            fillRule="evenodd"
             d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
             clip-rule="evenodd"
           />
@@ -173,7 +179,7 @@ const Paging = () => {
       </a>
 
       <div>
-        <label for="PaginationPage" className="sr-only">
+        <label htmlFor="PaginationPage" className="sr-only">
           Page
         </label>
 
@@ -200,7 +206,7 @@ const Paging = () => {
           <path
             fill-rule="evenodd"
             d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-            clip-rule="evenodd"
+            clipRule="evenodd"
           />
         </svg>
       </a>
@@ -209,29 +215,54 @@ const Paging = () => {
 };
 
 const AdoptionList = () => {
+  const [pets, setPets] = useState([]);
+
+  useEffect(() => {
+    // Fetch pets data using graphQLFetch
+    const fetchPets = async () => {
+      const query = `
+        query {
+          getAllPets {
+            _id
+            user_id
+            pet_name
+            pet_type
+            pet_age
+            pet_gender
+            vaccination_details
+            health_issues
+            pet_behaviour
+            pet_description
+            pet_image
+            pet_video
+          }
+        }
+      `;
+
+      try {
+        const data = await graphQLFetch(query);
+        if (data && data.getAllPets) {
+          setPets(data.getAllPets);
+          console.log(data);
+        }
+      } catch (error) {
+        console.error("Error fetching pets:", error);
+      }
+    };
+
+    fetchPets();
+  }, []);
+
   return (
     <div className="pt-[9.1rem] pb-[2rem]">
       <Banner />
       <FilterPets />
       <div className="mx-7 p-5 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-8 lg:mx-14">
-        <div className=" rounded-lg  m-5 ">
-          <PetCard />
-        </div>
-        <div className="rounded-lg m-5">
-          <PetCard />
-        </div>
-        <div className="rounded-lg m-5">
-          <PetCard />
-        </div>
-        <div className="rounded-lg  m-5">
-          <PetCard />
-        </div>
-        <div className=" rounded-lg  m-5">
-          <PetCard />
-        </div>
-        <div className=" rounded-lg  m-5">
-          <PetCard />
-        </div>
+        {pets.map((pet) => (
+          <div key={pet._id} className="rounded-lg m-5">
+            <PetCard pet={pet} />
+          </div>
+        ))}
       </div>
       <Paging />
     </div>
