@@ -38,6 +38,7 @@ type LostPet {
   contact_phone: String!
   contact_email: String!
   additional_info: String
+   pet_image: [String]
 }
 
 input petInput {
@@ -74,6 +75,7 @@ input LostPetInput {
 type Query {
   getAllPets: [Pet]
   getSuccessStories: [SuccessStory!]
+  getLostPets: [LostPet]
 }
 
 type Mutation {

@@ -7,6 +7,7 @@ import catImg from "../assets/images/cat.png";
 import allPetImg from "../assets/images/all_pet.png";
 import otherPetImg from "../assets/images/other_pet.png";
 import graphQLFetch from "../graphQLFetch";
+import ReactPaginate from "react-paginate";
 
 function Banner() {
   return (
@@ -120,8 +121,6 @@ const PetCard = ({ pet }) => {
   const petImageUrl =
     pet_image && pet_image.length > 0 ? pet_image[0] : petimage;
 
-  console.log("firstimage", petImageUrl);
-
   return (
     <article className="flex flex-col xl:flex-row bg-white transition hover:shadow-xl">
       <div className="sm:block sm:basis-56">
@@ -156,66 +155,51 @@ const PetCard = ({ pet }) => {
   );
 };
 
-const Paging = () => {
+const Paging = ({ items, itemsPerPage }) => {
+  const [itemOffset, setItemOffset] = useState(0);
+
+  const endOffset = itemOffset + itemsPerPage;
+  const currentItems = items.slice(itemOffset, endOffset);
+  const pageCount = Math.ceil(items.length / itemsPerPage);
+
+  const handlePageClick = (event) => {
+    const newOffset = (event.selected * itemsPerPage) % items.length;
+    setItemOffset(newOffset);
+  };
+
   return (
-    <div className="inline-flex justify-center gap-1 w-full">
-      <a
-        href="#"
-        className="inline-flex size-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
-      >
-        <span className="sr-only">Prev Page</span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-3 w-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-            clip-rule="evenodd"
-          />
-        </svg>
-      </a>
-
-      <div>
-        <label htmlFor="PaginationPage" className="sr-only">
-          Page
-        </label>
-
-        <input
-          type="number"
-          className="h-8 w-12 rounded border border-gray-100 bg-white p-0 text-center text-xs font-medium text-gray-900 [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
-          min="1"
-          value="2"
-          id="PaginationPage"
+    <>
+      {currentItems.map((pet) => (
+        <div key={pet._id} className="rounded-lg m-5">
+          <PetCard pet={pet} />
+        </div>
+      ))}
+      <div className="w-full col-span-2 flex justify-center mt-4">
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel=">>"
+          onPageChange={handlePageClick}
+          pageRangeDisplayed={5}
+          pageCount={pageCount}
+          previousLabel="<<"
+          renderOnZeroPageCount={null}
+          containerClassName="pagination-ul"
+          pageClassName="page-item-li"
+          pageLinkClassName="page-link-a"
+          previousClassName="page-item"
+          nextClassName="page-item"
+          breakClassName="page-item"
+          activeClassName="selected"
+          disabledClassName="disabled"
         />
       </div>
-
-      <a
-        href="#"
-        className="inline-flex size-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
-      >
-        <span className="sr-only">Next Page</span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-3 w-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </a>
-    </div>
+    </>
   );
 };
 
 const AdoptionList = () => {
   const [pets, setPets] = useState([]);
+  const itemsPerPage = 6;
 
   useEffect(() => {
     // Fetch pets data using graphQLFetch
@@ -258,13 +242,8 @@ const AdoptionList = () => {
       <Banner />
       <FilterPets />
       <div className="mx-7 p-5 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-8 lg:mx-14">
-        {pets.map((pet) => (
-          <div key={pet._id} className="rounded-lg m-5">
-            <PetCard pet={pet} />
-          </div>
-        ))}
+        <Paging items={pets} itemsPerPage={itemsPerPage} />
       </div>
-      <Paging />
     </div>
   );
 };
