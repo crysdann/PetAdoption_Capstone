@@ -3,9 +3,6 @@ const { getDb,getCurrentUserCount } = require("./db");
 async function createUser(_, { user }) {
     try {
         const db = getDb();
-        createUser.id = await getCurrentUserCount("users");
-        console.log(createUser.id);
-    
         // Insert user into collection
         const result = await db.collection('users').insertOne(user);
         console.log("User data inserted successfully", result.insertedId);

@@ -22,7 +22,6 @@ const Signup = () => {
           password: "${data.password}"
         }) {
           _id
-          user_id
           first_name
           last_name
           email
