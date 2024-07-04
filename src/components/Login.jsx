@@ -1,11 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import Sign_in1 from "../assets/images/signin_img.jpg";
+import graphQLFetch from "../graphQLFetch";
 import "../style.css"; 
 
 const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
-  
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate(); // Get navigate function from useNavigate
+
   useEffect(() => {
     function createSnowflake() {
       const snowflake = document.createElement('div');
@@ -16,17 +20,42 @@ const Login = () => {
       document.body.appendChild(snowflake);
 
       setTimeout(() => {
-          snowflake.remove();
+        snowflake.remove();
       }, 5000);
     }
 
     const interval = setInterval(createSnowflake, 100);
 
-    return () => clearInterval(interval); // Cleanup function to remove interval when component unmounts
-  }, []); // Empty dependency array ensures the effect runs only once when the component mounts
+    return () => clearInterval(interval);
+  }, []);
 
   const onSubmit = async (data) => {
     console.log("Form submitted", data);
+    setErrorMessage('');
+    
+    try {
+      const query = `
+        mutation {
+          loginUser(email: "${data.email}", password: "${data.password}") {
+            _id    
+          }
+        }
+      `;
+
+      const result = await graphQLFetch(query);
+      console.log("result", result);
+
+      if (result) {
+        // Redirect or perform actions upon successful login
+        localStorage.setItem('user_id', result); 
+        navigate('/');
+      } else {
+        setErrorMessage('Invalid email or password');
+      }
+    } catch (error) {
+      console.log('Login error:', error);
+      setErrorMessage('An error occurred. Please try again.');
+    }
   };
 
   return (
@@ -36,6 +65,7 @@ const Login = () => {
           <div className="mx-auto max-w-lg text-center">
             <h1 className="text-2xl font-bold primary-brown sm:text-3xl">Log In Now</h1>
           </div>
+          {errorMessage && <div className="text-red-500 text-center mb-4">{errorMessage}</div>}
           <form onSubmit={handleSubmit(onSubmit)} className="mx-auto mb-0 mt-8 max-w-md space-y-4">
             <div>
               <label htmlFor="email" className="sr-only">Email</label>

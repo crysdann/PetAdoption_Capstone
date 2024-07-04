@@ -1,14 +1,46 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import Registerimg from "../assets/images/register.jpg";
 import Pawprint from "../assets/images/pawprintsignup.png";
+import graphQLFetch from "../graphQLFetch";
 import "../style.css";
 
 const Signup = () => {
-  const { register, handleSubmit, formState: { errors }, watch } = useForm();
+  const { register, handleSubmit, formState: { errors }, watch, reset } = useForm();
+  const [successMessage, setSuccessMessage] = useState('');
   const allFields = watch();
-  const onSubmit = (data) => {
+
+  const onSubmit = async (data) => {
     console.log("Form submitted", data);
+    try {
+      const query = `mutation {
+        createUser(user: {
+          first_name: "${data.first_name}",
+          last_name: "${data.last_name}",
+          email: "${data.email}",
+          phone: "${data.phone}",
+          password: "${data.password}"
+        }) {
+          _id
+          user_id
+          first_name
+          last_name
+          email
+          phone
+        }
+      }`;
+
+      const result = await graphQLFetch(query);
+      console.log('Data inserted', result);
+
+      // Clear the form fields
+      reset();
+
+      // Show success message
+      setSuccessMessage('Registration successful!');
+    } catch (error) {
+      console.log('Error adding user:', error);
+    }
   };
 
   return (
@@ -27,10 +59,11 @@ const Signup = () => {
           </section>
           <main className="flex items-center justify-center sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
             <div className="w-11/12 lg:max-w-3xl">
+              {successMessage && <div className="mb-4 text-primary-brown">{successMessage}</div>}
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="mt-16 grid grid-cols-6 gap-5"
-                noValidate
+                className="mt-16 grid grid-cols-6 gap-5" name="createUser"
+                noValidate 
               >
                 <div className="col-span-6 sm:col-span-3">
                   <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">First Name</label>
@@ -130,7 +163,7 @@ const Signup = () => {
                 <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                   <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                     Already have an account?&nbsp;&nbsp;
-                    <a href="#" className="text-gray-700 underline">Log in</a>
+                    <a href="Login" className="text-gray-700 underline">Log in</a>
                   </p>
                 </div>
               </form>

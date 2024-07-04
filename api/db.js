@@ -36,9 +36,22 @@ async function getCurrentPetCount(name) {
     );
   return result.value.current;
 }
+
+//function updating user counter
+async function getCurrentUserCount(name) {
+  const result = await db
+    .collection("usercounter")
+    .findOneAndUpdate(
+      { _id: name },
+      { $inc: { current: 1 } },
+      { returnOriginal: false }
+    );
+  return result.value.current;
+}
+
 //function for getting db object
 function getDb() {
   return db;
 }
 //export modules
-module.exports = { connectToDb, getCurrentPetCount, getDb };
+module.exports = { connectToDb, getCurrentPetCount, getCurrentUserCount, getDb };

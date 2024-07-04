@@ -38,7 +38,26 @@ type LostPet {
   contact_phone: String!
   contact_email: String!
   additional_info: String
-   pet_image: [String]
+  pet_image: [String]
+}
+
+type User {
+  _id: ID!
+  user_id: ID!
+  first_name: String!
+  last_name: String!
+  email: String!
+  phone: String!
+  password: String!
+}
+
+input UserInput {
+  user_id: Int!
+  first_name: String!
+  last_name: String!
+  email: String!
+  phone: String!
+  password: String!
 }
 
 input petInput {
@@ -87,4 +106,6 @@ type Mutation {
     petPhotoUrl: String!
   ): SuccessStory!
   addLostPet(input: LostPetInput!): LostPet!
+  createUser(user: UserInput): User!
+  loginUser(email: String!, password: String!): User!
 }
