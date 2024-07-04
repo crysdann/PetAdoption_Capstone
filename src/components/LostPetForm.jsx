@@ -1,159 +1,265 @@
 import React from "react";
-import petImage from "../assets/images/lostforms.png";
+import { useForm } from "react-hook-form";
+import graphQLFetch from "../graphQLFetch";
 
 const LostPetForm = () => {
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-        console.log("Form Data:", data);
+    const { register, handleSubmit, reset, formState: { errors } } = useForm();
+
+    const onSubmit = async (data) => {
+        console.log(data); // Check if data is correctly logged
+        try {
+            const query = `
+                mutation {
+                    addLostPet(input: {
+                        user_id: 1,
+                        pet_name: "${data.floating_pet_name}",
+                        pet_type: "${data.floating_pet_type}",
+                        pet_breed: "${data.floating_Breed}",
+                        last_seen_location: "${data.floating_lastseenLocation}",
+                        last_seen_date: "${data.floating_lastSeenDate}",
+                        contact_name: "${data.floating_contactName}",
+                        contact_phone: "${data.floating_contactNumber}",
+                        contact_email: "${data.floating_contactEmail}",
+                        additional_info: "${data.floating_pet_description}"
+                    }) {
+                        _id
+                        user_id
+                        pet_name
+                        pet_type
+                        pet_breed
+                        last_seen_location
+                        last_seen_date
+                        contact_name
+                        contact_phone
+                        contact_email
+                        additional_info
+                    }
+                }
+            `;
+
+            const response = await graphQLFetch(query);
+
+            if (!response || !response.addLostPet) {
+                throw new Error("Failed to report lost pet.");
+            }
+
+            console.log("Lost pet successfully reported.");
+            alert("Lost pet successfully reported.")
+            reset(); // Reset form after successful submission
+        } catch (error) {
+            console.error("Error reporting lost pet:", error);
+            alert("Failed to report lost pet.");
+        }
     };
 
     return (
-        <section className="relative flex flex-wrap items-center pt-20 lg:pt-40 px-4 sm:px-6 sm:pt-20 lg:px-8">
-            <div className="w-full lg:w-1/2 mx-auto lg:mx-0 lg:pr-8">
-                <div className="mx-auto max-w-lg text-center mt-20 lg:mt-0">
-                    <h1 className="text-xl font-bold sm:text-3xl">Report Lost Pet</h1>
-                    <p className="mt-4 text-xl text-dark">
-                        Please fill out the form below to report your lost pet. We will assist you in finding them.
-                    </p>
+        <div className="pt-[12rem] pb-[2rem] mx-9 sm:mx-15">
+            <h1 className="flex justify-center pt-4 pb-2 text-[2rem] sm:text-[3rem] font-bold text-[#644b3c] ">
+                Report Lost Pet
+            </h1>
+            <p className="mt-4 text-xl text-dark text-center mb-5">
+                Please fill out the form below to report your lost pet. We will assist you in finding them.
+            </p>
+            <form className="max-w-3xl mx-auto bg-white shadow-md rounded px-8 pt-8 pb-8" onSubmit={handleSubmit(onSubmit)}>
+                <div className="grid md:grid-cols-2 md:gap-6">
+                    <div className="relative z-0 w-full mb-5 group">
+                        <input
+                            type="text"
+                            id="floating_pet_name"
+                            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-red-500 focus:outline-none focus:ring-0 focus:border-red-600 peer "
+                            placeholder=" "
+                            required
+                            {...register("floating_pet_name", { required: "Pet Name is required", })}
+                        />
+                        <label
+                            htmlFor="floating_pet_name"
+                            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-red-600 peer-focus:dark:text-red-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                        >
+                            Pet Name
+                        </label>
+                        {errors.floating_pet_name && (
+                            <p className="text-red-500 text-sm mt-1">{errors.floating_pet_name.message}</p>
+                        )}
+
+                    </div>
+                    <div className="relative z-0 w-full mb-5 group">
+                        <select
+                            {...register("floating_pet_type", { required: "Pet type is required" })}
+                            className="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-red-500 focus:outline-none focus:ring-0 focus:border-red-600 peer"
+                            defaultValue="" // Set defaultValue to an empty string or the initial value you want
+                            required
+                        >
+                            <option value="">Select Pet Species</option>
+                            <option value="dog">Dog</option>
+                            <option value="cat">Cat</option>
+                            <option value="other">Other</option>
+                        </select>
+                        {errors.floating_pet_type && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.floating_pet_type.message}
+                            </p>
+                        )}
+                    </div>
+                </div>
+                <div className="relative z-0 w-full mb-5 group">
+                    <input
+                        type="text"
+                        {...register("floating_Breed", { required: false })}
+                        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-red-500 focus:outline-none focus:ring-0 focus:border-red-600 peer"
+                        placeholder=" "
+
+                    />
+                    <label
+                        htmlFor="floating_Breed"
+                        className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-red-600 peer-focus:dark:text-red-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    >
+                        Breed
+                    </label>
                 </div>
 
-                <form onSubmit={handleSubmit} className="mx-20 mt-10 max-w-lg space-y-3">
-                    <div>
-                        <label htmlFor="petName" className="sr-only">Pet Name</label>
-                        <div className="mb-5">
-                            <input
-                                type="text"
-                                name="petName"
-                                className="w-full rounded-lg border-gray-200 p-2 text-xl shadow-sm"
-                                placeholder="Pet Name"
-                                required
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <label htmlFor="species" className="sr-only">Species</label>
-                        <div className="mb-5">
-                            <select
-                                name="species"
-                                required
-                                className="w-full rounded-lg border-gray-200 p-2 text-xl shadow-sm"
-                                defaultValue=""
-                            >
-                                <option value="">Select Species</option>
-                                <option value="cat">Cat</option>
-                                <option value="dog">Dog</option>
-                                <option value="other">Other Pets</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <label htmlFor="breed" className="sr-only">Breed</label>
-                        <div className="mb-5">
-                            <input
-                                type="text"
-                                name="breed"
-                                className="w-full rounded-lg border-gray-200 p-2 text-xl shadow-sm"
-                                placeholder="Breed"
-                            />
-                        </div>
-                    </div>
 
-                    <div>
-                        <label htmlFor="lastSeenLocation" className="sr-only">Last Seen Location</label>
-                        <div className="mb-5">
-                            <input
-                                type="text"
-                                name="lastSeenLocation"
-                                className="w-full rounded-lg border-gray-200 p-2 text-xl shadow-sm"
-                                placeholder="Last Seen Location"
-                                required
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <label htmlFor="lastSeenDate" className="sr-only">Last Seen Date</label>
-                        <div className="mb-5">
-                            <input
-                                type="date"
-                                name="lastSeenDate"
-                                className="w-full rounded-lg border-gray-200 p-2 text-xl shadow-sm"
-                                placeholder="Last Seen Date"
-                                required
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <label htmlFor="contactName" className="sr-only">ContactName</label>
-                        <div className="mb-5">
-                            <input
-                                type="text"
-                                name="contactName"
-                                required
-                                className="w-full rounded-lg border-gray-200 p-2 text-xl shadow-sm"
-                                placeholder="ContactName"
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <label htmlFor="contactPhone" className="sr-only">ContactPhone</label>
-                        <div className="mb-5">
-                            <input
-                                type="text"
-                                name="contactPhone"
-                                required
-                                className="w-full rounded-lg border-gray-200 p-2 text-xl shadow-sm"
-                                placeholder="ContactPhone"
-                            />
+                <div className="relative z-0 w-full mb-5 group">
+                    <input
+                        type="text"
+                        {...register("floating_lastseenLocation", { required: "Mention LastSeen Location" })}
+                        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-red-500 focus:outline-none focus:ring-0 focus:border-red-600 peer"
+                        placeholder=" "
+                        required
+                    />
+                    <label
+                        htmlFor="floating_lastseenLocation"
+                        className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-red-600 peer-focus:dark:text-red-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    >
+                        LastSeen Location
+                    </label>
+                    {errors.floating_lastseenLocation && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.floating_lastseenLocation.message}
+                        </p>
+                    )}
+                </div>
+                <div className="relative z-0 w-full mb-5 group">
+                    <input
+                        type="date"
+                        {...register("floating_lastSeenDate", { required: "Mention the last seen date" })}
+                        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-red-500 focus:outline-none focus:ring-0 focus:border-red-600 peer"
+                        placeholder=" "
+                        required
+                    />
+                    <label
+                        htmlFor="floating_lastSeenDate"
+                        className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-red-600 peer-focus:dark:text-red-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    >
+                        Last Seen Date
+                    </label>
+                    {errors.floating_lastSeenDate && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.floating_lastSeenDate.message}
+                        </p>
+                    )}
+                </div>
 
-                        </div>
-                    </div>
-                    <div>
-                        <label htmlFor="contactEmail" className="sr-only">ContactEmail</label>
-                        <div className="mb-5">
-                            <input
-                                type="text"
-                                name="contactEmail"
-                                className="w-full rounded-lg border-gray-200 p-2 text-xl shadow-sm"
-                                placeholder="ContactEmail"
-                                required
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <label htmlFor="additionalInfo" className="sr-only">Description</label>
-                        <div className="mb-5">
-                            <textarea
-                                name="additionalInfo"
-                                className="w-full rounded-lg border-gray-200 p-2 text-xl shadow-sm"
-                                placeholder="Description"
-                                required
-                            />
-                        </div>
-                    </div>
+                <div className="relative z-0 w-full mb-5 group">
+                    <textarea
+                        {...register("floating_contactName", { required: "Provide your Name" })}
+                        id="floating_contactName"
+                        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-red-500 focus:outline-none focus:ring-0 focus:border-red-600 peer"
+                        placeholder=" "
+                        required
+                    ></textarea>
+                    <label
+                        htmlFor="floating_contactName"
+                        className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-red-600 peer-focus:dark:text-red-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    >
+                        ContactName
+                    </label>
+                    {errors.floating_contactName && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.floating_contactName.message}
+                        </p>
+                    )}
+                </div>
 
-                    <div className="flex items-center justify-center">
-                        <button
-                            type="submit"
-                            className="block rounded text-xl bg-primary-light-brown border-[#d2c8bc] py-3 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
-                        >
-                            Submit
-                        </button>
-                    </div>
-                </form>
-            </div>
+                <div className="relative z-0 w-full mb-5 group">
+                    <textarea
+                        {...register("floating_contactNumber", {
+                            required: "Provide your contact number",
+                            pattern: { value: /^\d{10}$/, message: "Please enter a 10-digit number", },
+                        })}
+                        id="floating_contactNumber"
+                        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-red-500 focus:outline-none focus:ring-0 focus:border-red-600 peer"
+                        placeholder=" "
+                        required
+                    ></textarea>
+                    <label
+                        htmlFor="floating_contactNumber"
+                        className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-red-600 peer-focus:dark:text-red-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    >
+                        Contact Number
+                    </label>
+                    {errors.floating_contactNumber && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.floating_contactNumber.message}
+                        </p>
+                    )}
+                </div>
 
+                <div className="relative z-0 w-full mb-5 group">
+                    <textarea
+                        {...register("floating_contactEmail", {
+                            required: "Provide your Email",
+                            pattern: {
+                                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: "Please enter a valid email address",
+                            },
+                        })}
+                        id="floating_contactEmail"
+                        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-red-500 focus:outline-none focus:ring-0 focus:border-red-600 peer"
+                        placeholder=" "
+                        required
+                    ></textarea>
+                    <label
+                        htmlFor="floating_contactEmail"
+                        className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-red-600 peer-focus:dark:text-red-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    >
+                        Contact Email
+                    </label>
+                    {errors.floating_contactEmail && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.floating_contactEmail.message}
+                        </p>
+                    )}
+                </div>
 
-            <div className="relative h-auto w-full sm:h-64 lg:h-auto lg:w-1/2 mb-8 ">
+                <div className="relative z-0 w-full mb-5 group">
+                    <textarea
+                        {...register("floating_pet_description", { required: "Provide a short description about pet" })}
 
-                <img
-                    alt="Lost Pet"
-                    src={petImage}
-                    className="absolute inset-0 h-full w-full object-cover lg:static lg:h-auto lg:w-auto"
-                />
-            </div>
-        </section>
+                        id="floating_pet_description"
+                        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-red-500 focus:outline-none focus:ring-0 focus:border-red-600 peer"
+                        placeholder=" "
+                        required
+                    ></textarea>
+                    <label
+                        htmlFor="floating_pet_description"
+                        className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-red-600 peer-focus:dark:text-red-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    >
+                        Pet description
+                    </label>
+                    {errors.floating_pet_description && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.floating_pet_description.message}
+                        </p>
+                    )}
+                </div>
+
+                <button
+                    type="submit"
+                    className="inline-block shrink-0 rounded-md border bg-primary-brown px-12 py-3 text-sm font-medium text-white transition focus:outline-none focus:ring active:text-red-500"
+                >
+                    Submit
+                </button>
+            </form>
+        </div>
     );
 };
 

@@ -8,6 +8,7 @@ const AdoptForm = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm();
 
@@ -119,6 +120,8 @@ const AdoptForm = () => {
 
       // Handle success
       alert("Pet and images successfully registered for adoption.");
+      // Reset the form to its initial state
+      reset();
     } catch (error) {
       console.error("Error registering pet and images:", error);
       alert("Failed to register pet and images for adoption.");
@@ -139,20 +142,20 @@ const AdoptForm = () => {
             <input
               type="text"
               id="floating_pet_name"
-              className={`block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-b-2 border-gray-300 focus:border-gray-900 ${
+              className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
                 errors.floating_pet_name ? "border-red-500" : "border-gray-300"
               }`}
-              placeholder=" "
+              placeholder="Pet name"
               {...register("floating_pet_name", {
                 required: "Pet name is required",
               })}
             />
-            <label
+            {/* <label
               htmlFor="floating_pet_name"
-              className="peer-focus:font-large absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
               Pet name
-            </label>
+            </label> */}
             {errors.floating_pet_name && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.floating_pet_name.message}
@@ -162,7 +165,7 @@ const AdoptForm = () => {
           <div className="relative z-0 w-full mb-5 group">
             <select
               id="floating_pet_type"
-              className={`block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+              className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
                 errors.floating_pet_type ? "border-red-500" : ""
               }`}
               {...register("floating_pet_type", {
@@ -187,21 +190,21 @@ const AdoptForm = () => {
             <input
               type="number"
               id="floating_pet_age"
-              className={`block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+              className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
                 errors.floating_pet_age ? "border-red-500" : ""
               }`}
-              placeholder=" "
+              placeholder="Pet age"
               {...register("floating_pet_age", {
                 required: "Pet age is required",
                 min: { value: 0, message: "Age must be a positive number" },
               })}
             />
-            <label
+            {/* <label
               htmlFor="floating_pet_age"
               className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
               Pet age
-            </label>
+            </label> */}
             {errors.floating_pet_age && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.floating_pet_age.message}
@@ -211,7 +214,7 @@ const AdoptForm = () => {
           <div className="relative z-0 w-full mb-5 group">
             <select
               id="floating_pet_gender"
-              className={`block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+              className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
                 errors.floating_pet_gender ? "border-red-500" : ""
               }`}
               {...register("floating_pet_gender", {
@@ -233,20 +236,20 @@ const AdoptForm = () => {
         <div className="relative z-0 w-full mb-5 group">
           <textarea
             id="floating_vaccination_details"
-            className={`block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+            className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
               errors.floating_vaccination_details ? "border-red-500" : ""
             }`}
-            placeholder=" "
+            placeholder="Vaccination details"
             {...register("floating_vaccination_details", {
               required: "Vaccination details are required",
             })}
           ></textarea>
-          <label
+          {/* <label
             htmlFor="floating_vaccination_details"
             className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
             Vaccination details
-          </label>
+          </label> */}
           {errors.floating_vaccination_details && (
             <p className="text-red-500 text-sm mt-1">
               {errors.floating_vaccination_details.message}
@@ -257,20 +260,20 @@ const AdoptForm = () => {
         <div className="relative z-0 w-full mb-5 group">
           <textarea
             id="floating_health_issues"
-            className={`block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+            className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
               errors.floating_health_issues ? "border-red-500" : ""
             }`}
-            placeholder=" "
+            placeholder="Health issues"
             {...register("floating_health_issues", {
               required: "Health issues are required",
             })}
           ></textarea>
-          <label
+          {/* <label
             htmlFor="floating_health_issues"
             className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
             Health issues
-          </label>
+          </label> */}
           {errors.floating_health_issues && (
             <p className="text-red-500 text-sm mt-1">
               {errors.floating_health_issues.message}
@@ -281,20 +284,20 @@ const AdoptForm = () => {
         <div className="relative z-0 w-full mb-5 group">
           <textarea
             id="floating_pet_behaviour"
-            className={`block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+            className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
               errors.floating_pet_behaviour ? "border-red-500" : ""
             }`}
-            placeholder=" "
+            placeholder="Pet behaviour"
             {...register("floating_pet_behaviour", {
               required: "Pet behaviour is required",
             })}
           ></textarea>
-          <label
+          {/* <label
             htmlFor="floating_pet_behaviour"
             className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
             Pet behaviour
-          </label>
+          </label> */}
           {errors.floating_pet_behaviour && (
             <p className="text-red-500 text-sm mt-1">
               {errors.floating_pet_behaviour.message}
@@ -305,20 +308,20 @@ const AdoptForm = () => {
         <div className="relative z-0 w-full mb-5 group">
           <textarea
             id="floating_pet_description"
-            className={`block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+            className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
               errors.floating_pet_description ? "border-red-500" : ""
             }`}
-            placeholder=" "
+            placeholder="Pet description"
             {...register("floating_pet_description", {
               required: "Pet description is required",
             })}
           ></textarea>
-          <label
+          {/* <label
             htmlFor="floating_pet_description"
             className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
             Pet description
-          </label>
+          </label> */}
           {errors.floating_pet_description && (
             <p className="text-red-500 text-sm mt-1">
               {errors.floating_pet_description.message}
@@ -330,20 +333,20 @@ const AdoptForm = () => {
           <input
             type="file"
             id="floating_pet_image"
-            className={`block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none ${
+            className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
               errors.floating_pet_image ? "border-red-500" : ""
-            }`}
+            }`} placeholder="Pet images"
             {...register("floating_pet_image", {
               required: "Pet image is required",
             })}
             multiple
           />
-          <label
+          {/* <label
             htmlFor="floating_pet_image"
             className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
             Pet image
-          </label>
+          </label> */}
           {errors.floating_pet_image && (
             <p className="text-red-500 text-sm mt-1">
               {errors.floating_pet_image.message}

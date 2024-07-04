@@ -2,6 +2,7 @@ const fs = require("fs");
 const { ApolloServer } = require("apollo-server-express");
 const { createPet, insertImg, getAllPets } = require("./pets.js");
 const { createSuccessStory } = require("./successstories.js");
+const { addLostPet } = require("./lostpets.js")
 require("dotenv").config();
 
 const resolvers = {
@@ -12,6 +13,7 @@ const resolvers = {
     createPet: createPet,
     insertImg: insertImg,
     createSuccessStory: createSuccessStory,
+    addLostPet: addLostPet,
   },
 };
 

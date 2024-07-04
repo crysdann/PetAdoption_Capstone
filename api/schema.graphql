@@ -25,6 +25,20 @@ type SuccessStory {
   description: String!
 }
 
+type LostPet {
+  _id: ID!
+  user_id: Int!
+  pet_name: String!
+  pet_type: String!
+  pet_breed: String
+  last_seen_location: String!
+  last_seen_date: String!
+  contact_name: String!
+  contact_phone: String!
+  contact_email: String!
+  additional_info: String
+}
+
 input petInput {
   user_id: Int!
   pet_name: String!
@@ -43,6 +57,19 @@ input ImageInput {
   url: String!
 }
 
+input LostPetInput {
+  user_id: Int!
+  pet_name: String!
+  pet_type: String!
+  pet_breed: String
+  last_seen_location: String!
+  last_seen_date: String!
+  contact_name: String!
+  contact_phone: String!
+  contact_email: String!
+  additional_info: String
+}
+
 type Query {
   getAllPets: [Pet]
   getSuccessStories: [SuccessStory!]
@@ -52,4 +79,6 @@ type Mutation {
   createPet(pet: petInput!): Pet!
   insertImg(img: ImageInput!): Image!
   createSuccessStory(petName: String!, description: String!): SuccessStory!
+  addLostPet(input: LostPetInput!): LostPet!
+
 }
