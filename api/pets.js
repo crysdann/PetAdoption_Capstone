@@ -1,5 +1,6 @@
 const { getDb, getCurrentPetCount } = require("./db");
 
+
 ///creating new pet record
 async function createPet(_, { pet}) {
   try {
@@ -34,9 +35,44 @@ async function insertImg(_, { img }) {
     throw err; // Throw the error to be caught by GraphQL
   }
 }
+const getAllPets = async () => {
+  try {
+    const db = getDb();
+    const pets = await db.collection("pets").find({}).toArray();
+
+    if (pets.length === 0) {
+      console.log("No pets found in the database.");
+      return [];
+    }
+
+    // Map over each pet to fetch its associated images as an array of strings
+    const petsWithImages = await Promise.all(pets.map(async (pet) => {
+      const petId = pet._id.toString(); // Convert ObjectId to string
+      console.log("Processing petId:", petId);
+
+      // Fetch images associated with the petId as a string
+      const images = await db.collection("images").find({ petId }).toArray();
+      console.log("Fetched images for petId", petId, images); // Detailed debug log
+
+      const imageUrls = images.map(image => image.url);
+      console.log("Image URLs for petId", petId, imageUrls.length); // Detailed debug log
+
+      return {
+        ...pet,
+        pet_image: imageUrls,
+      };
+    }));
+
+    return petsWithImages;
+  } catch (err) {
+    console.error("Error fetching pets with images:", err);
+    throw err;
+  }
+};
+
 
 
 //export modules
 module.exports = {
-  createPet,insertImg
+  createPet,insertImg,getAllPets
 };
