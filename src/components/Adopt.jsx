@@ -203,7 +203,7 @@ const AdoptionList = () => {
   const { filter } = useParams();
   const [filteredPets, setFilteredPets] = useState([]);
   const navigate = useNavigate();
-  const itemsPerPage = 6;
+  const itemsPerPage = 4;
 
   useEffect(() => {
     const fetchPets = async () => {

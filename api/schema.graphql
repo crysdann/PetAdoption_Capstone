@@ -43,7 +43,6 @@ type LostPet {
 
 type User {
   _id: ID!
-  user_id: ID!
   first_name: String!
   last_name: String!
   email: String!
@@ -52,7 +51,6 @@ type User {
 }
 
 input UserInput {
-  user_id: Int!
   first_name: String!
   last_name: String!
   email: String!
