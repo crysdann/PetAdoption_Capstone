@@ -19,17 +19,23 @@ type Pet {
   pet_video: String
 }
 
-input petInput{
-    user_id: Int!
-    pet_name: String!
-    pet_type: String!
-    pet_age: Int!
-    pet_gender: String!
-    vaccination_details: String
-    health_issues: String
-    pet_behaviour: String
-    pet_description: String
-    pet_video: String
+type SuccessStory {
+  id: ID!
+  petName: String!
+  description: String!
+}
+
+input petInput {
+  user_id: Int!
+  pet_name: String!
+  pet_type: String!
+  pet_age: Int!
+  pet_gender: String!
+  vaccination_details: String
+  health_issues: String
+  pet_behaviour: String
+  pet_description: String
+  pet_video: String
 }
 
 input ImageInput {
@@ -37,12 +43,13 @@ input ImageInput {
   url: String!
 }
 
-type Query {  
+type Query {
   getAllPets: [Pet]
+  getSuccessStories: [SuccessStory!]
 }
 
 type Mutation {
-  createPet(pet:petInput!): Pet!
-  insertImg(img:ImageInput!): Image!
-  
+  createPet(pet: petInput!): Pet!
+  insertImg(img: ImageInput!): Image!
+  createSuccessStory(petName: String!, description: String!): SuccessStory!
 }
