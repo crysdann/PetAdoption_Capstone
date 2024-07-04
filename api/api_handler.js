@@ -1,15 +1,15 @@
 const fs = require('fs');
 const { ApolloServer } = require('apollo-server-express');
-const { createPet } = require('./pets.js');
+const { createPet,insertImg } = require('./pets.js');
 require('dotenv').config();
 
-const resolvers = {
-  Date: GraphQLDate,
-  Query: {
-    getAllPets:getAllPets,
-  },
+const resolvers = {  
+  // Query: {
+  //   getAllPets:getAllPets,
+  // },
   Mutation: {
     createPet:createPet,
+    insertImg:insertImg
   },
 };
 

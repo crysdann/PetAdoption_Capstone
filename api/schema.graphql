@@ -1,6 +1,12 @@
+type Image {
+  _id: ID!
+  petId: ID!
+  url: String!
+}
+
 type Pet {
   _id: ID!
-  user_id: ID!
+  user_id: Int!
   pet_name: String!
   pet_type: String!
   pet_age: Int!
@@ -9,17 +15,11 @@ type Pet {
   health_issues: String
   pet_behaviour: String
   pet_description: String
-  pet_image: String
   pet_video: String
 }
 
-type Query {  
-  getAllPets: [Pet]
-}
-
-type Mutation {
-  createPet(
-    user_id: ID!
+input petInput{
+    user_id: Int!
     pet_name: String!
     pet_type: String!
     pet_age: Int!
@@ -28,9 +28,20 @@ type Mutation {
     health_issues: String
     pet_behaviour: String
     pet_description: String
-    pet_image: String
     pet_video: String
-  ): Pet
+}
 
+input ImageInput {
+  petId: ID!
+  url: String!
+}
+
+type Query {  
+  getAllPets: [Pet]
+}
+
+type Mutation {
+  createPet(pet:petInput!): Pet!
+  insertImg(img:ImageInput!): Image!
   
 }
