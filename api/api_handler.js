@@ -1,6 +1,7 @@
 const fs = require("fs");
 const { ApolloServer } = require("apollo-server-express");
 const { createPet, insertImg, getAllPets } = require("./pets.js");
+const { createSuccessStory } = require("./successstories.js");
 require("dotenv").config();
 
 const resolvers = {
