@@ -1,37 +1,60 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import successstorieshero from "../assets/images/successstorieshero.jpg";
 import Pagination from "../components/Pagination";
 import { Link } from "react-router-dom";
-
-const successStoriesData = [
-  {
-    name: "Russel",
-    story:
-      "Russel's journey to his forever home is a tale of resilience, love, and second chances. Russel, a strikingly handsome tabby with expressive green eyes, was found wandering the streets, hungry and scared. His once lustrous fur was matted, and his spirit seemed broken. He had been on his own for months, surviving on scraps and the occasional kindness of strangers...",
-  },
-  {
-    name: "Russel",
-    story:
-      "Russel's journey to his forever home is a tale of resilience, love, and second chances. Russel, a strikingly handsome tabby with expressive green eyes, was found wandering the streets, hungry and scared. His once lustrous fur was matted, and his spirit seemed broken. He had been on his own for months, surviving on scraps and the occasional kindness of strangers...",
-  },
-  {
-    name: "Russel",
-    story:
-      "Russel's journey to his forever home is a tale of resilience, love, and second chances. Russel, a strikingly handsome tabby with expressive green eyes, was found wandering the streets, hungry and scared. His once lustrous fur was matted, and his spirit seemed broken. He had been on his own for months, surviving on scraps and the occasional kindness of strangers...",
-  },
-  {
-    name: "Russel",
-    story:
-      "Russel's journey to his forever home is a tale of resilience, love, and second chances. Russel, a strikingly handsome tabby with expressive green eyes, was found wandering the streets, hungry and scared. His once lustrous fur was matted, and his spirit seemed broken. He had been on his own for months, surviving on scraps and the occasional kindness of strangers...",
-  },
-  {
-    name: "Russel",
-    story:
-      "Russel's journey to his forever home is a tale of resilience, love, and second chances. Russel, a strikingly handsome tabby with expressive green eyes, was found wandering the streets, hungry and scared. His once lustrous fur was matted, and his spirit seemed broken. He had been on his own for months, surviving on scraps and the occasional kindness of strangers...",
-  },
-];
+import graphQLFetch from "../graphQLFetch";
 
 const SuccessStories = () => {
+  const [successStories, setSuccessStories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchSuccessStories = async () => {
+    const query = `
+    query {
+      getSuccessStories {
+        id
+        petName
+        description
+        petPhotoUrl
+      }
+    }
+  `;
+
+    try {
+      const result = await graphQLFetch(query);
+      // console.log(`Fetched stories: ${JSON.stringify(result)}`);
+
+      if (!result || !result.getSuccessStories) {
+        console.error("No success stories found or result is null.");
+        return [];
+      }
+
+      return result.getSuccessStories;
+    } catch (error) {
+      console.error("Error fetching stories:", error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const stories = await fetchSuccessStories();
+        setSuccessStories(stories);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching stories:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="bg-primary-white">
       <div className="w-full pt-[146px]">
@@ -54,7 +77,8 @@ const SuccessStories = () => {
           <img
             src={successstorieshero}
             alt="success stories hero"
-            className="w-full h-[613px] object-cover"></img>
+            className="w-full h-[613px] object-cover"
+          />
           {/* Image by Lenka Novotná from Pixabay
           https://pixabay.com/photos/dog-labrador-pet-canine-companion-1861839/ */}
         </div>
@@ -64,7 +88,7 @@ const SuccessStories = () => {
       </h1>
       <div className="max-w-[1640px] mx-auto p-10 py-12 grid md:grid-cols-1 sm:p-20 gap-6">
         {/* Pagination */}
-        <Pagination items={successStoriesData} itemsPerPage={4} />
+        <Pagination items={successStories} itemsPerPage={4} />
       </div>
     </div>
   );

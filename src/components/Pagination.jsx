@@ -4,6 +4,8 @@ import adoptedpets from "../assets/images/adoptedpets.png";
 import { Link } from "react-router-dom";
 
 function Items({ currentItems }) {
+  console.log(`Fetched stories in pagination ${JSON.stringify(currentItems)}`);
+  // console.log(`PetName: ${JSON.stringify(currentItems[petName])}`);
   return (
     <>
       {currentItems &&
@@ -11,20 +13,20 @@ function Items({ currentItems }) {
           <div
             className="rounded-xl relative md:custom-grid-item h-[200px]"
             key={index}>
-            <div className="bg-white shadow-md text-[#5e5e5b] grid grid-cols-4 cursor-pointer transform transition-transform duration-300 hover:scale-105">
-              <div className="col-span-2 md:col-span-1 flex">
+            <div className="bg-white shadow-md text-[#5e5e5b] grid grid-cols-4 cursor-pointer transform transition-transform duration-300 hover:scale-105 h-[100%]">
+              <div className="col-span-2 md:col-span-1 flex overflow-hidden">
                 <img
-                  src={adoptedpets}
+                  src={item.petPhotoUrl}
                   alt="adoptedPets"
                   className="w-full object-cover"
                 />
               </div>
               <div className="col-span-2 md:col-span-3 flex flex-col h-full overflow-hidden">
                 <h2 className="flex justify-center mt-[1rem] mb-[1rem] text-primary-brown">
-                  {item.name}
+                  {item.petName}
                 </h2>
                 <p className="pl-[1rem] pr-[1rem] multi-line-ellipsis">
-                  {item.story}
+                  {item.description}
                 </p>
                 <Link
                   to="/SuccessStoriesNarratives"
@@ -47,7 +49,7 @@ function PaginatedItems({ items, itemsPerPage }) {
   const pageCount = Math.ceil(items.length / itemsPerPage);
 
   const handlePageClick = (event) => {
-    const newOffset = (event.selected * itemsPerPage) % items.length;
+    const newOffset = event.selected * itemsPerPage;
     setItemOffset(newOffset);
   };
 
