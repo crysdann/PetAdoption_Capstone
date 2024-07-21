@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useMediaQuery } from "react-responsive";
 import bannerImage from "../assets/images/banner_img.jpg";
 import petimage from "../assets/images/pet2.jpg";
 import dogImg from "../assets/images/dog.png";
@@ -36,7 +37,7 @@ function Banner() {
 
           <div className="mt-8 flex flex-wrap gap-4 text-center">
             <a
-              href="#"
+              href="/successstories"
               className="block w-full rounded bg-rose-600 px-12 py-3 text-sm font-medium text-white shadow hover:bg-rose-700 focus:outline-none focus:ring active:bg-rose-500 sm:w-auto"
             >
               Success Stories
@@ -56,64 +57,120 @@ function Banner() {
 }
 
 function FilterPets() {
-  return (
-    <div className="container mx-auto mt-8 flex justify-center">
-      <div className="flex flex-wrap -m-2 justify-center w-7/12">
-        <div className="w-full sm:w-1/2 md:w-1/4 p-2">
-          <Link
-            to="/adopt/all"
-            className="block p-4 shadow text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
+
+  const isMobile = useMediaQuery({ query: '(max-width: 480px)' });
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const handleSelect = (value) => {
+    window.location.href = value;
+  };
+
+  if (isMobile) {
+    return (
+      <div className="container mx-auto mt-8 flex justify-center">
+        <div className="relative w-3/4 md:w-1/2 lg:w-1/3">
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="block w-full p-4 border-2 border-gray-300 rounded-lg shadow bg-white"
           >
-            <img
-              src={allPetImg}
-              alt="icon_petImage"
-              style={{ width: "4rem" }}
-            ></img>
-            <span className="mt-1 font-bold">All Pets</span>
-          </Link>
-        </div>
-        <div className="w-full sm:w-1/2 md:w-1/4 p-2">
-          <Link
-            to="/adopt/dog"
-            className="block p-6 shadow  text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
-          >
-            <img
-              src={dogImg}
-              alt="icon_petImage"
-              style={{ width: "4rem" }}
-            ></img>
-            <span className="font-bold">Dogs</span>
-          </Link>
-        </div>
-        <div className="w-full sm:w-1/2 md:w-1/4 p-2">
-          <Link
-            to="/adopt/cat"
-            className="block p-6 shadow  text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
-          >
-            <img
-              src={catImg}
-              alt="icon_petImage"
-              style={{ width: "4rem" }}
-            ></img>
-            <span className="font-bold">Cats</span>
-          </Link>
-        </div>
-        <div className="w-full sm:w-1/2 md:w-1/4 p-2">
-          <Link
-            to="/adopt/other"
-            className="block p-6 shadow  text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
-          >
-            <img
-              src={otherPetImg}
-              alt="icon_petImage"
-              style={{ width: "4rem" }}
-            ></img>
-            <span className="font-bold">Others</span>
-          </Link>
+            Filter pets
+          </button>
+          {dropdownOpen && (
+            <ul className="absolute w-full border-2 border-gray-300 rounded-lg shadow bg-white z-10">
+              <li
+                onClick={() => handleSelect('/adopt/all')}
+                className="flex items-center p-2 cursor-pointer hover:bg-gray-100"
+              >
+                <img src={allPetImg} alt="icon_petImage" className="w-6 h-6 mr-2" />
+                All Pets
+              </li>
+              <li
+                onClick={() => handleSelect('/adopt/dog')}
+                className="flex items-center p-2 cursor-pointer hover:bg-gray-100"
+              >
+                <img src={dogImg} alt="icon_petImage" className="w-6 h-6 mr-2" />
+                Dogs
+              </li>
+              <li
+                onClick={() => handleSelect('/adopt/cat')}
+                className="flex items-center p-2 cursor-pointer hover:bg-gray-100"
+              >
+                <img src={catImg} alt="icon_petImage" className="w-6 h-6 mr-2" />
+                Cats
+              </li>
+              <li
+                onClick={() => handleSelect('/adopt/other')}
+                className="flex items-center p-2 cursor-pointer hover:bg-gray-100"
+              >
+                <img src={otherPetImg} alt="icon_petImage" className="w-6 h-6 mr-2" />
+                Others
+              </li>
+            </ul>
+          )}
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+  
+    return (
+      <div className="container mx-auto mt-8 flex justify-center">
+        <div className="flex flex-wrap -m-2 justify-center w-7/12">
+          <div className="w-1/2 md:w-1/4 p-2">
+            <Link
+              to="/adopt/all"
+              className="block p-4 shadow text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
+            >
+              <img
+                src={allPetImg}
+                alt="icon_petImage"
+                style={{ width: "4rem" }}
+              ></img>
+              <span className="mt-1 font-bold">All Pets</span>
+            </Link>
+          </div>
+          <div className="w-1/2 md:w-1/4 p-2">
+            <Link
+              to="/adopt/dog"
+              className="block p-6 shadow  text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
+            >
+              <img
+                src={dogImg}
+                alt="icon_petImage"
+                style={{ width: "4rem" }}
+              ></img>
+              <span className="font-bold">Dogs</span>
+            </Link>
+          </div>
+          <div className="w-1/2 md:w-1/4 p-2">
+            <Link
+              to="/adopt/cat"
+              className="block p-6 shadow  text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
+            >
+              <img
+                src={catImg}
+                alt="icon_petImage"
+                style={{ width: "4rem" }}
+              ></img>
+              <span className="font-bold">Cats</span>
+            </Link>
+          </div>
+          <div className="w-1/2 md:w-1/4 p-2">
+            <Link
+              to="/adopt/other"
+              className="block p-6 shadow  text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
+            >
+              <img
+                src={otherPetImg}
+                alt="icon_petImage"
+                style={{ width: "4rem" }}
+              ></img>
+              <span className="font-bold">Others</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  
 }
 
 const PetCard = ({ pet }) => {
@@ -257,14 +314,32 @@ const AdoptionList = () => {
        navigate(`/adopt/${filter}`);
   }, [filter, navigate]);
 
-  return (
-    <div className="pt-[9.1rem] pb-[2rem]">
-      <Banner />
-      <FilterPets />
-      <div className="mx-7 p-5 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-8 lg:mx-14">
-        <Paging items={filteredPets} itemsPerPage={itemsPerPage} />
+  if(filteredPets.length > 0)
+  {
+    return (
+      <div className="pt-[9.1rem] pb-[2rem]">
+        <Banner />
+        <FilterPets />
+        <div className="mx-7 p-5 md:grid md:grid-cols-2 md:gap-8 lg:mx-14">
+          <Paging items={filteredPets} itemsPerPage={itemsPerPage} />
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+  else
+  {
+    return (
+      <div className="pt-[9.1rem] pb-[2rem]">
+        <Banner />
+        <FilterPets />
+        <div className="mx-7 p-5 md:grid md:grid-cols-2 md:gap-8 lg:mx-14 flex items-center justify-center">
+          <p className="mt-2 text-md/relaxed text-gray-700 line-clamp-4 text-center">
+            No pets found!!
+          </p>
+        </div>
+      </div>
+    );
+  }
+  
 };
 export default AdoptionList;
