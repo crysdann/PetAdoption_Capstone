@@ -47,7 +47,8 @@ const Login = () => {
 
       if (result) {
         // Redirect or perform actions upon successful login
-        localStorage.setItem('user_id', result); 
+        const userid = result.loginUser._id;
+        localStorage.setItem('user_id', userid); 
         navigate('/');
       } else {
         setErrorMessage('Invalid email or password');
