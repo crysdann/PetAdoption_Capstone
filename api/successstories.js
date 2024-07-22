@@ -30,6 +30,41 @@ async function createSuccessStory(_, { petName, description, petPhotoUrl }) {
   }
 }
 
+// Fetch all success stories function
+const getSuccessStories = async () => {
+  try {
+    const db = getDb();
+    console.log("Connecting to the database...");
+
+    const successStories = await db
+      .collection("successStories")
+      .find({})
+      .toArray();
+
+    console.log("Fetched success stories:", successStories);
+    console.log("Number of success stories fetched:", successStories.length);
+
+    if (successStories.length === 0) {
+      console.log("No success stories found in the database.");
+      return [];
+    }
+
+    // Transform _id to id for each success story
+    const successStoriesWithId = successStories.map((story) => {
+      story.id = story._id.toString();
+      delete story._id;
+      return story;
+    });
+
+    return successStoriesWithId;
+  } catch (err) {
+    console.error("Error fetching success stories:", err);
+    throw err;
+  }
+};
+
+// Export modules
 module.exports = {
   createSuccessStory,
+  getSuccessStories,
 };

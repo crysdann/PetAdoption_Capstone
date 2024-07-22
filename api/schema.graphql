@@ -91,7 +91,7 @@ input LostPetInput {
 
 type Query {
   getAllPets: [Pet]
-  getSuccessStories: [SuccessStory!]
+  getSuccessStories: [SuccessStory]
   getLostPets: [LostPet]
 }
 
