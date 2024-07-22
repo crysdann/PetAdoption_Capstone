@@ -30,6 +30,7 @@ function App() {
         <Route path="adopt/:filter" element={<AdoptionList />} />
         <Route path="petdetails" element={<PetDetails />} />
         <Route path="lostpets" element={<LostPets />} />
+        <Route path="lostpets/:filter" element={<LostPets />} />
         <Route path="successstories" element={<SuccessStories />} />
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
@@ -41,7 +42,7 @@ function App() {
         <Route path="UserProfile" element={<UserProfile />} />
         <Route path="adoptdataform" element={<AdoptForm />} />
         <Route path="successstoriesform" element={<SuccessStoriesForm />} />
-        <Route path="adminprofile" element={<Adminprofile/>}/>
+        <Route path="adminprofile" element={<Adminprofile />} />
 
       </Routes>
       {!isLoginPage && <Footer />}

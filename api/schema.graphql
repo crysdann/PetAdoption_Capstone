@@ -28,7 +28,7 @@ type SuccessStory {
 
 type LostPet {
   _id: ID!
-  user_id: Int!
+  user_id: ID!
   pet_name: String!
   pet_type: String!
   pet_breed: String
@@ -77,7 +77,7 @@ input ImageInput {
 }
 
 input LostPetInput {
-  user_id: Int!
+  user_id: ID!
   pet_name: String!
   pet_type: String!
   pet_breed: String
@@ -91,13 +91,15 @@ input LostPetInput {
 
 type Query {
   getAllPets: [Pet]
-  getSuccessStories: [SuccessStory]
+  getSuccessStories: [SuccessStory!]
   getLostPets: [LostPet]
+  getLostPetsByUser(user_id: ID!): [LostPet]
 }
 
 type Mutation {
   createPet(pet: petInput!): Pet!
   insertImg(img: ImageInput!): Image!
+  insertPetImg(img: ImageInput!): Image!
   createSuccessStory(
     petName: String!
     description: String!

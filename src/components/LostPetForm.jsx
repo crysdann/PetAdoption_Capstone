@@ -1,6 +1,8 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import graphQLFetch from "../graphQLFetch";
+import firebase from "firebase/compat/app";
+import "firebase/compat/storage";
 
 const LostPetForm = () => {
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
@@ -8,20 +10,21 @@ const LostPetForm = () => {
     const onSubmit = async (data) => {
         console.log(data); // Check if data is correctly logged
         try {
+            let files = data.floating_pet_image;
+            if (!Array.isArray(files)) {
+                files = Array.from(files); // Convert to array using Array.from()
+            }
+            const images = [];
+            const userid = localStorage.getItem("user_id");
+
+            if (!userid) {
+                alert("Please login to continue");
+                return;
+            }
+
             const query = `
-                mutation {
-                    addLostPet(input: {
-                        user_id: 1,
-                        pet_name: "${data.floating_pet_name}",
-                        pet_type: "${data.floating_pet_type}",
-                        pet_breed: "${data.floating_Breed}",
-                        last_seen_location: "${data.floating_lastseenLocation}",
-                        last_seen_date: "${data.floating_lastSeenDate}",
-                        contact_name: "${data.floating_contactName}",
-                        contact_phone: "${data.floating_contactNumber}",
-                        contact_email: "${data.floating_contactEmail}",
-                        additional_info: "${data.floating_pet_description}"
-                    }) {
+                mutation AddLostPet($input: LostPetInput!) {
+                    addLostPet(input: $input) {
                         _id
                         user_id
                         pet_name
@@ -33,22 +36,83 @@ const LostPetForm = () => {
                         contact_phone
                         contact_email
                         additional_info
+                        pet_image
                     }
                 }
             `;
 
-            const response = await graphQLFetch(query);
+            const variables = {
+                input: {
+                    user_id: userid,
+                    pet_name: data.floating_pet_name,
+                    pet_type: data.floating_pet_type,
+                    pet_breed: data.floating_Breed,
+                    last_seen_location: data.floating_lastseenLocation,
+                    last_seen_date: data.floating_lastSeenDate,
+                    contact_name: data.floating_contactName,
+                    contact_phone: data.floating_contactNumber,
+                    contact_email: data.floating_contactEmail,
+                    additional_info: data.floating_pet_description
+                }
+            };
+
+            const response = await graphQLFetch(query, variables);
 
             if (!response || !response.addLostPet) {
                 throw new Error("Failed to report lost pet.");
             }
 
-            console.log("Lost pet successfully reported.");
-            alert("Lost pet successfully reported.")
-            reset(); // Reset form after successful submission
+            const uploadPromises = files.map(async (selectedFile) => {
+                if (selectedFile) {
+                    const storageRef = firebase.storage().ref();
+                    const fileRef = storageRef.child(selectedFile.name);
+
+                    try {
+                        const snapshot = await fileRef.put(selectedFile);
+                        const downloadURL = await snapshot.ref.getDownloadURL();
+                        images.push(downloadURL);
+                    } catch (error) {
+                        console.error("Error uploading file:", error);
+                        throw new Error("Failed to upload file.");
+                    }
+                }
+            });
+
+            await Promise.all(uploadPromises);
+
+            const insertPromises = images.map(async (imageUrl) => {
+                const insertImgQuery = `
+                    mutation InsertImage($img: ImageInput!) {
+                        insertImg(img: $img) {
+                            _id
+                            petId
+                            url
+                        }
+                    }
+                `;
+
+                const insertImgVariables = {
+                    img: {
+                        petId: response.addLostPet._id,
+                        url: imageUrl,
+                    }
+                };
+
+                const insertImgResponse = await graphQLFetch(insertImgQuery, insertImgVariables);
+
+                if (!insertImgResponse || !insertImgResponse.insertImg) {
+                    console.error("Failed to insert image:", insertImgResponse);
+                    throw new Error("Failed to insert image.");
+                }
+            });
+
+            await Promise.all(insertPromises);
+
+            alert("Lost Pet and images successfully registered .");
+            reset();
         } catch (error) {
-            console.error("Error reporting lost pet:", error);
-            alert("Failed to report lost pet.");
+            console.error("Error registering pet and images:", error);
+            alert("Failed to register lost pet and images .");
         }
     };
 
@@ -248,6 +312,24 @@ const LostPetForm = () => {
                     {errors.floating_pet_description && (
                         <p className="text-red-500 text-sm mt-1">
                             {errors.floating_pet_description.message}
+                        </p>
+                    )}
+                </div>
+                <div className="relative z-0 w-full mb-5 group">
+                    <input
+                        type="file"
+                        id="floating_pet_image"
+                        className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${errors.floating_pet_image ? "border-red-500" : ""
+                            }`}
+                        placeholder="Pet images"
+                        {...register("floating_pet_image", {
+                            required: "Pet image is required",
+                        })}
+                        multiple
+                    />
+                    {errors.floating_pet_image && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.floating_pet_image.message}
                         </p>
                     )}
                 </div>

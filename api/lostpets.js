@@ -1,37 +1,40 @@
 const { getDb } = require("./db");
 
-///creating new pet record
+// Function to add a new lost pet record
 async function addLostPet(_, { input }) {
     try {
         const db = getDb();
-        //insert pet data
+        // Insert pet data
         const lostPet = await db.collection("lostPets").insertOne(input);
         console.log("Report data inserted successfully", lostPet.insertedId);
 
-        const insertedPet = await db
-            .collection("lostPets")
-            .findOne({ _id: lostPet.insertedId });
+        // Fetch and return the inserted pet record
+        const insertedPet = await db.collection("lostPets").findOne({ _id: lostPet.insertedId });
         return insertedPet;
     } catch (err) {
         console.error("Error in data insert:", err);
+        throw err;
     }
 }
 
-async function uploadImg(_, { img }) {
+// Function to insert a new pet image
+async function insertPetImg(_, { img }) {
     try {
         const db = getDb();
         // Insert image data into MongoDB
         const newImg = await db.collection("images").insertOne(img);
         console.log("Image inserted successfully:", newImg.insertedId);
 
-        // Retrieve the inserted image from MongoDB
+        // Fetch and return the inserted image record
         const insertedImage = await db.collection("images").findOne({ _id: newImg.insertedId });
         return insertedImage;
     } catch (err) {
         console.error("Error inserting image:", err);
-        throw err; // Throw the error to be caught by GraphQL
+        throw err;
     }
 }
+
+// Function to get all lost pets, including images
 const getLostPets = async () => {
     try {
         const db = getDb();
@@ -42,17 +45,17 @@ const getLostPets = async () => {
             return [];
         }
 
-        // Map over each pet to fetch its associated images as an array of strings
+        // Map over each pet to fetch its associated images
         const petsWithImages = await Promise.all(lostPets.map(async (pet) => {
             const petId = pet._id.toString(); // Convert ObjectId to string
             console.log("Processing petId:", petId);
 
-            // Fetch images associated with the petId as a string
+            // Fetch images associated with the petId
             const images = await db.collection("images").find({ petId }).toArray();
-            console.log("Fetched images for petId", petId, images); // Detailed debug log
+            console.log("Fetched images for petId", petId, images);
 
             const imageUrls = images.map(image => image.url);
-            console.log("Image URLs for petId", petId, imageUrls.length); // Detailed debug log
+            console.log("Image URLs for petId", petId, imageUrls.length);
 
             return {
                 ...pet,
@@ -67,9 +70,47 @@ const getLostPets = async () => {
     }
 };
 
+// Function to get lost pets by user ID
+const getLostPetsByUser = async (_, { user_id }) => {
+    try {
+        const db = getDb();
+        // Query lost pets by user_id
+        const lostPets = await db.collection("lostPets").find({ user_id }).toArray();
 
+        if (lostPets.length === 0) {
+            console.log("No lostPets found for the given user_id.");
+            return [];
+        }
 
-//export modules
+        // Map over each pet to fetch its associated images
+        const petsWithImages = await Promise.all(lostPets.map(async (pet) => {
+            const petId = pet._id.toString(); // Convert ObjectId to string
+            console.log("Processing petId:", petId);
+
+            // Fetch images associated with the petId
+            const images = await db.collection("images").find({ petId }).toArray();
+            console.log("Fetched images for petId", petId, images);
+
+            const imageUrls = images.map(image => image.url);
+            console.log("Image URLs for petId", petId, imageUrls.length);
+
+            return {
+                ...pet,
+                pet_image: imageUrls,
+            };
+        }));
+
+        return petsWithImages;
+    } catch (err) {
+        console.error("Error fetching pets by user_id:", err);
+        throw err;
+    }
+};
+
+// Export modules
 module.exports = {
-    addLostPet, uploadImg, getLostPets
+    addLostPet,
+    insertPetImg,
+    getLostPets,
+    getLostPetsByUser
 };
