@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import ReactPaginate from "react-paginate";
-import adoptedpets from "../assets/images/adoptedpets.png";
 import { Link } from "react-router-dom";
 
 function Items({ currentItems }) {
@@ -29,7 +28,7 @@ function Items({ currentItems }) {
                   {item.description}
                 </p>
                 <Link
-                  to="/SuccessStoriesNarratives"
+                  to={`/SuccessStoriesNarratives/${item.id}`}
                   className="flex justify-end text-primary-brown font-bold pt-[0.5rem] pr-[1rem] pb-[1rem] hover:text-rose-600">
                   view more...
                 </Link>

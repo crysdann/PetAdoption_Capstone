@@ -1,37 +1,71 @@
-import React from "react";
-import successstoriesnarrativesimg from "../assets/images/successstoriesnarratives.png";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import graphQLFetch from "../graphQLFetch";
 import ss1 from "../assets/images/ss1.jpg";
 import ss2 from "../assets/images/ss2.jpg";
 import ss3 from "../assets/images/ss3.jpg";
 
 const SuccessStoriesNarratives = () => {
+  const { id } = useParams();
+  const [story, setStory] = useState(null);
+
+  useEffect(() => {
+    const fetchSuccessStories = async () => {
+      const query = `
+      query {
+        getSuccessStories {
+          id
+          petName
+          description
+          petPhotoUrl
+        }
+      }
+    `;
+
+      try {
+        const result = await graphQLFetch(query);
+
+        if (!result || !result.getSuccessStories) {
+          console.error("No success stories found or result is null.");
+          return [];
+        }
+
+        return result.getSuccessStories;
+      } catch (error) {
+        console.error("Error fetching stories:", error);
+        return [];
+      }
+    };
+
+    const getStoryById = async () => {
+      console.log("Fetching story by ID:", id);
+      const stories = await fetchSuccessStories();
+      console.log("All stories:", stories);
+      const storyData = stories.find((story) => story.id === id);
+      console.log("Found story:", storyData);
+      setStory(storyData);
+    };
+    getStoryById();
+  }, [id]);
+
+  console.log("Story state before rendering:", story);
+
+  if (!story) return <div>Loading...</div>;
+
   return (
     <div className="w-full pt-[12rem]">
       <div className="w-full h-full flex flex-col justify-center items-center pl-[3rem] pr-[3rem] sm:pl-[4rem] sm:pr-[4rem]">
         <h1 className="px-4 text-5xl sm:text-5xl md:text-6xl font-bold font-dancing-script text-[#5c4e51]">
-          Russel
+          {story.petName}
         </h1>
         <div className="md:h-[500px] md:w-[90%] ">
           <img
-            src={successstoriesnarrativesimg}
+            src={story.petPhotoUrl}
             alt="successstoriesnarratives"
             className="h-[100%] mt-[2rem] w-full object-cover border-2 p-[10px]"></img>
         </div>
         <h3 className="px-4 pt-[3rem] text-[18px] pb-[3rem] text-justify">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-          culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum
-          dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-          commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-          velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-          occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-          mollit anim id est laborum.
+          {story.description}
         </h3>
       </div>
       <div className="flex bg-primary-white  flex-col justify-center items-center p-[4rem]">

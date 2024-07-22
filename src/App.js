@@ -35,7 +35,7 @@ function App() {
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
         <Route
-          path="successstoriesnarratives"
+          path="successstoriesnarratives/:id"
           element={<SuccessStoriesNarratives />}
         />
         <Route path="lostpetform" element={<LostPetForm />} />
@@ -43,7 +43,6 @@ function App() {
         <Route path="adoptdataform" element={<AdoptForm />} />
         <Route path="successstoriesform" element={<SuccessStoriesForm />} />
         <Route path="adminprofile" element={<Adminprofile />} />
-
       </Routes>
       {!isLoginPage && <Footer />}
     </>
