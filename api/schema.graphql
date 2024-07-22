@@ -6,7 +6,7 @@ type Image {
 
 type Pet {
   _id: ID!
-  user_id: Int!
+  user_id: ID!
   pet_name: String!
   pet_type: String!
   pet_age: Int!
@@ -59,7 +59,7 @@ input UserInput {
 }
 
 input petInput {
-  user_id: Int!
+  user_id: ID!
   pet_name: String!
   pet_type: String!
   pet_age: Int!

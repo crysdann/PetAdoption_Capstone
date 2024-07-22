@@ -13,7 +13,8 @@ const AdoptForm = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    console.log("data", data);
+    // console.log("data", data);
+    // console.log(localStorage.getItem('user_id'));
     try {
       let files = data.floating_pet_image;
 
@@ -23,10 +24,14 @@ const AdoptForm = () => {
       }
 
       const images = [];
-      const query = `
+      const userid = localStorage.getItem("user_id");
+      if (userid == null || userid == undefined || userid == "") {
+        alert("Please login to continue");
+      } else {
+        const query = `
       mutation {
         createPet(pet: {
-          user_id: 1,
+          user_id: "${userid}",
           pet_name: "${data.floating_pet_name}",
           pet_type: "${data.floating_pet_type}",
           pet_age: ${data.floating_pet_age},
@@ -53,41 +58,41 @@ const AdoptForm = () => {
       }
     `;
 
-      const response = await graphQLFetch(query);
+        const response = await graphQLFetch(query);
 
-      if (!response || !response.createPet) {
-        throw new Error("Failed to create pet.");
-      }
-
-      const petId = response.createPet._id;
-
-      // Upload images and insert their URLs in batches
-      const uploadPromises = files.map(async (selectedFile) => {
-        if (selectedFile) {
-          const storageRef = firebase.storage().ref();
-          const fileRef = storageRef.child(selectedFile.name);
-
-          try {
-            const snapshot = await fileRef.put(selectedFile);
-            const downloadURL = await snapshot.ref.getDownloadURL();
-
-            // Store the image URL in the images array
-            images.push(downloadURL);
-          } catch (error) {
-            console.error("Error uploading file:", error);
-            throw new Error("Failed to upload file.");
-          }
-        } else {
-          console.log("No file selected.");
+        if (!response || !response.createPet) {
+          throw new Error("Failed to create pet.");
         }
-      });
 
-      // Wait for all file uploads to complete
-      await Promise.all(uploadPromises);
+        const petId = response.createPet._id;
 
-      // Insert image URLs into the database in batches
-      const insertPromises = images.map(async (imageUrl) => {
-        const insertImgQuery = `
+        // Upload images and insert their URLs in batches
+        const uploadPromises = files.map(async (selectedFile) => {
+          if (selectedFile) {
+            const storageRef = firebase.storage().ref();
+            const fileRef = storageRef.child(selectedFile.name);
+
+            try {
+              const snapshot = await fileRef.put(selectedFile);
+              const downloadURL = await snapshot.ref.getDownloadURL();
+
+              // Store the image URL in the images array
+              images.push(downloadURL);
+            } catch (error) {
+              console.error("Error uploading file:", error);
+              throw new Error("Failed to upload file.");
+            }
+          } else {
+            console.log("No file selected.");
+          }
+        });
+
+        // Wait for all file uploads to complete
+        await Promise.all(uploadPromises);
+
+        // Insert image URLs into the database in batches
+        const insertPromises = images.map(async (imageUrl) => {
+          const insertImgQuery = `
           mutation InsertImage($img: ImageInput!) {
             insertImg(img: $img) {
               _id
@@ -97,31 +102,32 @@ const AdoptForm = () => {
           }
         `;
 
-        const insertImgVariables = {
-          img: {
-            petId: petId,
-            url: imageUrl,
-          },
-        };
+          const insertImgVariables = {
+            img: {
+              petId: petId,
+              url: imageUrl,
+            },
+          };
 
-        const insertImgResponse = await graphQLFetch(
-          insertImgQuery,
-          insertImgVariables
-        );
+          const insertImgResponse = await graphQLFetch(
+            insertImgQuery,
+            insertImgVariables
+          );
 
-        if (!insertImgResponse || !insertImgResponse.insertImg) {
-          console.error("Failed to insert image:", insertImgResponse);
-          throw new Error("Failed to insert image.");
-        }
-      });
+          if (!insertImgResponse || !insertImgResponse.insertImg) {
+            console.error("Failed to insert image:", insertImgResponse);
+            throw new Error("Failed to insert image.");
+          }
+        });
 
-      // Wait for all database insertions to complete
-      await Promise.all(insertPromises);
+        // Wait for all database insertions to complete
+        await Promise.all(insertPromises);
 
-      // Handle success
-      alert("Pet and images successfully registered for adoption.");
-      // Reset the form to its initial state
-      reset();
+        // Handle success
+        alert("Pet and images successfully registered for adoption.");
+        // Reset the form to its initial state
+        reset();
+      }
     } catch (error) {
       console.error("Error registering pet and images:", error);
       alert("Failed to register pet and images for adoption.");
@@ -335,7 +341,8 @@ const AdoptForm = () => {
             id="floating_pet_image"
             className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
               errors.floating_pet_image ? "border-red-500" : ""
-            }`} placeholder="Pet images"
+            }`}
+            placeholder="Pet images"
             {...register("floating_pet_image", {
               required: "Pet image is required",
             })}
