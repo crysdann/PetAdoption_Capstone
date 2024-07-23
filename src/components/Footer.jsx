@@ -26,17 +26,17 @@ const Footer = () => {
             <div className="text-xl sm:text-2xl md:text-4xl flex flex-col space-y-4 sm:p-6 items-center sm:items-start">
               <div className="flex items-center">
                 <IoLocationOutline className="mr-2 w-6 h-6" />
-                <h2 className="text-[15px]">
+                <h2 className="text-[15px] sm:text-xl">
                   PetConnect, Waterloo, Ontario, Canada
                 </h2>
               </div>
               <div className="flex items-center">
                 <LuPhone className="mr-2 w-4 h-4" />
-                <h2 className="text-[15px]">+1 999-999-9999</h2>
+                <h2 className="text-[15px] sm:text-xl">+1 999-999-9999</h2>
               </div>
               <div className="flex items-center">
                 <MdOutlineMail className="mr-2" />
-                <h2 className="text-[15px]">petconnect@gmail.com</h2>
+                <h2 className="text-[15px] sm:text-xl">petconnect@gmail.com</h2>
               </div>
             </div>
             <div className="flex flex-row space-y-4 pb-16 text-dark text-center justify-center md:flex-col">
