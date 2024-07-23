@@ -63,7 +63,7 @@ const SuccessStories = () => {
             <h1 className="px-4 text-5xl sm:text-5xl md:text-6xl font-bold font-dancing-script">
               Your <span>Pet Connect</span> story
             </h1>
-            <h3 className="px-4 pt-4 text-[18px] w-[30rem] md:w-[45rem] sm:w-[35rem]">
+            <h3 className="px-4 pt-4 text-[18px] sm:w-[45rem] md:w-[40rem]">
               Sharing your Pet Connect experience can inspire others to adopt,
               find lost pets and bring joy to their homes. Your story can show
               the positive impact and spread the joy to inspire others!
