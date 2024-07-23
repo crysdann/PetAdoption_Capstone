@@ -35,14 +35,14 @@ const SuccessStoriesForm = () => {
         petPhotoUrl = await snapshot.ref.getDownloadURL();
       }
 
-      const userid = localStorage.getItem("user_id");
-      if (!userid) {
+      const userId = localStorage.getItem("user_id");
+      if (!userId) {
         alert("Please login to continue");
         return;
       }
       const query = `
-        mutation createSuccessStory($petName: String!, $description: String!, $petPhotoUrl: String!) {
-          createSuccessStory(petName: $petName, description: $description, petPhotoUrl: $petPhotoUrl) {
+        mutation createSuccessStory($user_id: ID!, $petName: String!, $description: String!, $petPhotoUrl: String!) {
+          createSuccessStory(input: {user_id: $user_id, petName: $petName, description: $description, petPhotoUrl: $petPhotoUrl}) {
             id
             petName
             description
@@ -52,6 +52,7 @@ const SuccessStoriesForm = () => {
       `;
 
       const variables = {
+        user_id: userId,
         petName,
         description,
         petPhotoUrl,
@@ -61,7 +62,7 @@ const SuccessStoriesForm = () => {
 
       console.log("GraphQL Response:", response);
 
-      if (response.createSuccessStory) {
+      if (response && response.createSuccessStory) {
         setPetName("");
         setPetPhoto(null);
         setDescription("");
@@ -125,12 +126,6 @@ const SuccessStoriesForm = () => {
               Submit
             </button>
 
-            {successMessage && (
-              <p className="text-green-500 text-sm mt-1">{successMessage}</p>
-            )}
-            {errorMessage && (
-              <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
-            )}
             {successMessage && (
               <p className="text-green-500 text-sm mt-1">{successMessage}</p>
             )}

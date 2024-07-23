@@ -1,10 +1,12 @@
 const { ObjectId } = require("mongodb");
 const { getDb } = require("./db");
 
-async function createSuccessStory(_, { petName, description, petPhotoUrl }) {
+async function createSuccessStory(_, { input }) {
   try {
+    const { user_id, petName, description, petPhotoUrl } = input;
     const db = getDb();
     const newSuccessStory = await db.collection("successStories").insertOne({
+      user_id: ObjectId(user_id),
       petName,
       description,
       petPhotoUrl,
