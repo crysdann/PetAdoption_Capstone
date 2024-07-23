@@ -28,6 +28,12 @@ type SuccessStory {
   description: String!
   petPhotoUrl: String!
 }
+input SuccessStoryInput {
+  user_id: ID!
+  petName: String!
+  description: String!
+  petPhotoUrl: String!
+}
 
 type LostPet {
   _id: ID!
@@ -108,11 +114,7 @@ type Mutation {
   createPet(pet: petInput!): Pet!
   insertImg(img: ImageInput!): Image!
   insertPetImg(img: ImageInput!): Image!
-  createSuccessStory(
-    petName: String!
-    description: String!
-    petPhotoUrl: String!
-  ): SuccessStory!
+  createSuccessStory(input: SuccessStoryInput!): SuccessStory!
   addLostPet(input: LostPetInput!): LostPet!
   createUser(user: UserInput): User!
   loginUser(email: String!, password: String!): User!
