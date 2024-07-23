@@ -12,24 +12,31 @@ const Signup = () => {
 
   const onSubmit = async (data) => {
     console.log("Form submitted", data);
-    try {
-      const query = `mutation {
-        createUser(user: {
-          first_name: "${data.first_name}",
-          last_name: "${data.last_name}",
-          email: "${data.email}",
-          phone: "${data.phone}",
-          password: "${data.password}"
-        }) {
-          _id
-          first_name
-          last_name
-          email
-          phone
-        }
-      }`;
+    try{
+    const query = `mutation CreateUser($user: UserInput!) {
+      createUser(user: $user) {
+        _id
+        first_name
+        last_name
+        email
+        phone
+        password
+        user_type
+      }
+    }`;
 
-      const result = await graphQLFetch(query);
+    const variables = {
+      user: {
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        phone: data.phone,
+        password: data.password,
+        user_type: "regular"
+      }
+    };
+
+      const result = await graphQLFetch(query,variables);
       console.log('Data inserted', result);
 
       // Clear the form fields

@@ -57,6 +57,7 @@ type User {
   email: String!
   phone: String!
   password: String!
+  user_type: String!
 }
 
 input UserInput {
@@ -65,6 +66,7 @@ input UserInput {
   email: String!
   phone: String!
   password: String!
+  user_type: String!
 }
 
 input petInput {
@@ -119,5 +121,4 @@ type Mutation {
   addLostPet(input: LostPetInput!): LostPet!
   createUser(user: UserInput): User!
   loginUser(email: String!, password: String!): User!
-  
 }
