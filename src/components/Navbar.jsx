@@ -151,11 +151,12 @@ const Navbar = () => {
             />
           </div>
         </form>
+        {isLoggedIn && (
         <div
           className="text-2xl hover:text-primary-brown hover:bg-primary-white transition duration-300 cursor-pointer ml-4 mr-4 border rounded-3xl border-gray w-[3rem] h-[3rem] flex justify-center items-center user-profile-icon"
           onClick={handleProfileDropdown}>
           <FaRegUser />
-        </div>
+        </div>)}
         {profileDropdown && isLoggedIn && (
           <div className="flex flex-col z-10 absolute top-[5rem] right-[1rem] w-[120px] rounded-2xl border-[1px] userprofiledropdown bg-primary-light-brown opacity-85">
             <ul className="flex flex-col text-[17px]">
