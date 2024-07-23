@@ -11,7 +11,9 @@ type Pet {
   pet_type: String!
   pet_age: Int!
   pet_gender: String!
-  vaccination_details: String
+  pet_breed: String!
+  vaccination_status: String!
+  location: String!
   health_issues: String
   pet_behaviour: String
   pet_description: String
@@ -65,7 +67,9 @@ input petInput {
   pet_type: String!
   pet_age: Int!
   pet_gender: String!
-  vaccination_details: String
+  pet_breed: String!
+  vaccination_status: String!
+  location: String!
   health_issues: String
   pet_behaviour: String
   pet_description: String
@@ -97,7 +101,7 @@ type Query {
   getLostPets: [LostPet]
   getLostPetsByUser(user_id: ID!): [LostPet]
   getUserDetails(_id: ID!): User
-  
+  getPetDetails(petId: ID!): Pet!
 }
 
 type Mutation {

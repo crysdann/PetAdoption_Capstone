@@ -25,7 +25,7 @@ const AdoptForm = () => {
 
       const images = [];
       const userid = localStorage.getItem("user_id");
-      if (userid == null || userid == undefined || userid == "") {
+      if (userid === null || userid === undefined || userid === "") {
         alert("Please login to continue");
       } else {
         const query = `
@@ -36,7 +36,9 @@ const AdoptForm = () => {
           pet_type: "${data.floating_pet_type}",
           pet_age: ${data.floating_pet_age},
           pet_gender: "${data.floating_pet_gender}",
-          vaccination_details: "${data.floating_vaccination_details || ""}",
+          pet_breed: "${data.floating_pet_breed}",          
+          vaccination_status: "${data.floating_pet_vaccine || ""}",
+          location: "${data.floating_location}",
           health_issues: "${data.floating_health_issues || ""}",
           pet_behaviour: "${data.floating_pet_behaviour || ""}",
           pet_description: "${data.floating_pet_description || ""}",
@@ -48,7 +50,9 @@ const AdoptForm = () => {
           pet_type
           pet_age
           pet_gender
-          vaccination_details
+          pet_breed
+          vaccination_status
+          location
           health_issues
           pet_behaviour
           pet_description   
@@ -190,7 +194,6 @@ const AdoptForm = () => {
             )}
           </div>
         </div>
-
         <div className="grid md:grid-cols-2 md:gap-6">
           <div className="relative z-0 w-full mb-5 group">
             <input
@@ -238,27 +241,69 @@ const AdoptForm = () => {
             )}
           </div>
         </div>
-
+        <div className="grid md:grid-cols-2 md:gap-6">
+          <div className="relative z-0 w-full mb-5 group">
+            <input
+              type="text"
+              id="floating_pet_breed"
+              className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
+                errors.floating_pet_breed ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Pet breed"
+              {...register("floating_pet_breed", {
+                required: "Pet breed is required",
+              })}
+            />
+            {/* <label
+              htmlFor="floating_pet_name"
+              className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+            >
+              Pet name
+            </label> */}
+            {errors.floating_pet_breed && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.floating_pet_breed.message}
+              </p>
+            )}
+          </div>
+          <div className="relative z-0 w-full mb-5 group">
+            <select
+              id="floating_pet_vaccine"
+              className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
+                errors.floating_pet_vaccine ? "border-red-500" : ""
+              }`}
+              {...register("floating_pet_vaccine", {
+                required: "Pet Vaccination status is required",
+              })}
+            >
+              <option value="">Select vaccination status</option>
+              <option value="Up to date">Up to date</option>
+              <option value="Pending">Pending</option>
+              <option value="Not started">Not started</option>
+              <option value="Unknown">Unknown</option>
+            </select>
+            {errors.floating_pet_vaccine && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.floating_pet_vaccine.message}
+              </p>
+            )}
+          </div>
+        </div>
         <div className="relative z-0 w-full mb-5 group">
-          <textarea
-            id="floating_vaccination_details"
+          <input
+            id="floating_location"
             className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
-              errors.floating_vaccination_details ? "border-red-500" : ""
+              errors.floating_location ? "border-red-500" : ""
             }`}
-            placeholder="Vaccination details"
-            {...register("floating_vaccination_details", {
-              required: "Vaccination details are required",
+            placeholder="Location"
+            {...register("floating_location", {
+              required: "Location is required",
             })}
-          ></textarea>
-          {/* <label
-            htmlFor="floating_vaccination_details"
-            className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-          >
-            Vaccination details
-          </label> */}
-          {errors.floating_vaccination_details && (
+          />
+
+          {errors.floating_location && (
             <p className="text-red-500 text-sm mt-1">
-              {errors.floating_vaccination_details.message}
+              {errors.floating_location.message}
             </p>
           )}
         </div>

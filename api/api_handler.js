@@ -1,6 +1,6 @@
 const fs = require("fs");
 const { ApolloServer } = require("apollo-server-express");
-const { createPet, insertImg, getAllPets, getAllPetsByUser } = require("./pets.js");
+const { createPet, insertImg, getAllPets, getAllPetsByUser, getPetDetails } = require("./pets.js");
 const { addLostPet, insertPetImg, getLostPets, getLostPetsByUser } = require("./lostpets.js")
 const { createUser, loginUser, getUserDetails } = require("./users.js");
 const {
@@ -17,6 +17,7 @@ const resolvers = {
     getLostPetsByUser: getLostPetsByUser,
     getSuccessStories: getSuccessStories,
     getUserDetails: getUserDetails,
+    getPetDetails: getPetDetails,
   },
   Mutation: {
     createPet: createPet,
