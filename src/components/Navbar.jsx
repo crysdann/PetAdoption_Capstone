@@ -8,13 +8,23 @@ import { IoSearch } from "react-icons/io5";
 const Navbar = () => {
   const [nav, setNav] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const handleNav = () => {
     setNav(!nav);
   };
   const handleProfileDropdown = () => {
     setProfileDropdown(!profileDropdown);
   };
+  const handleLogout = () => {
+    localStorage.removeItem("user_id");
+    setIsLoggedIn(false);
+    setProfileDropdown(false);
+  };
   useEffect(() => {
+    const userId = localStorage.getItem("user_id");
+    if (userId) {
+      setIsLoggedIn(true);
+    }
     const handleClickOutside = (event) => {
       if (
         !event.target.closest(".userprofiledropdown") &&
@@ -24,7 +34,10 @@ const Navbar = () => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-  });
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div>
@@ -61,11 +74,19 @@ const Navbar = () => {
               Admin Profile
             </Link>
           </li>
-          <li className="p-4 text-lg">
-            <Link to="/login" className="hover:text-primary-brown">
-              Login
-            </Link>
-          </li>
+          {isLoggedIn ? (
+            <li
+              className="p-4 text-lg cursor-pointer hover:text-primary-brown"
+              onClick={handleLogout}>
+              Logout
+            </li>
+          ) : (
+            <li className="p-4 text-lg">
+              <Link to="/login" className="hover:text-primary-brown">
+                Login
+              </Link>
+            </li>
+          )}
         </ul>
         <div className="flex items-center p-4 space-x-4 ml-auto sm:ml-0">
           <div className="sm:hidden">
@@ -78,8 +99,9 @@ const Navbar = () => {
         </div>
         {/* Mobile Menu */}
         <div
-          className={`${nav ? "left-0" : "left-[-100%]"
-            } overflow-y-hidden md:hidden ease-in duration-300 absolute text-gray-300 top-0 w-full h-screen bg-black/90 py-7 flex flex-col`}>
+          className={`${
+            nav ? "left-0" : "left-[-100%]"
+          } overflow-y-hidden md:hidden ease-in duration-300 absolute text-gray-300 top-0 w-full h-screen bg-black/90 py-7 flex flex-col`}>
           <ul className="h-full w-full text-center pt-12">
             <li className="p-4 text-2xl py-8" onClick={handleNav}>
               <Link to="/">Home</Link>
@@ -129,7 +151,6 @@ const Navbar = () => {
             <ul className="flex flex-col text-[17px]">
               <li className="p-[10px] border-b border-white hover:text-primary-white cursor-pointer">
                 <Link to="/UserProfile">Profile</Link>
-
               </li>
               <li className="p-[10px] border-b border-white hover:text-primary-white cursor-pointer">
                 Settings
