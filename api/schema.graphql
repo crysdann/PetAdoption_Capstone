@@ -104,6 +104,7 @@ type Query {
   getAllPets: [Pet]
   getAllPetsByUser(user_id: ID!): [Pet]
   getSuccessStories: [SuccessStory!]
+  getSuccessStoriesByUser(user_id: ID!): [SuccessStory]
   getLostPets: [LostPet]
   getLostPetsByUser(user_id: ID!): [LostPet]
   getUserDetails(_id: ID!): User

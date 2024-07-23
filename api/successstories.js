@@ -64,9 +64,44 @@ const getSuccessStories = async () => {
     throw err;
   }
 };
+// Function to fetch success stories by user ID
+const getSuccessStoriesByUser = async (_, { user_id }) => {
+  try {
+    const db = getDb();
+    console.log("Connecting to the database...");
+
+    const successStories = await db
+      .collection("successStories")
+      .find({ user_id: ObjectId(user_id) })
+      .toArray();
+
+    console.log("Fetched success stories by user:", successStories);
+    console.log("Number of success stories fetched:", successStories.length);
+
+    if (successStories.length === 0) {
+      console.log("No success stories found for the user.");
+      return [];
+    }
+
+    // Transform _id to id for each success story
+    const successStoriesWithId = successStories.map((story) => {
+      story.id = story._id.toString();
+      delete story._id;
+      return story;
+    });
+
+    return successStoriesWithId;
+  } catch (err) {
+    console.error("Error fetching success stories by user:", err);
+    throw err;
+  }
+};
+
+
 
 // Export modules
 module.exports = {
   createSuccessStory,
   getSuccessStories,
+  getSuccessStoriesByUser,
 };

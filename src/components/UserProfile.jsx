@@ -50,20 +50,20 @@ const UserProfile = () => {
           {
             query: `
               query GetAllPetsByUser($user_id: ID!) {
-                getAllPetsByUser(user_id: $user_id) {
-                  _id
-          pet_name
-          pet_type
-          pet_age
-          pet_gender
-          pet_breed
-          vaccination_status
-          location
-          health_issues
-          pet_behaviour
-          pet_description   
-          pet_image   
-          pet_video
+                    getAllPetsByUser(user_id: $user_id) {
+                      _id
+                      pet_name
+                      pet_type
+                      pet_age
+                      pet_gender
+                      pet_breed
+                      vaccination_status
+                      location
+                      health_issues
+                      pet_behaviour
+                      pet_description
+                      pet_image
+                      pet_video
                 }
               }
             `,
@@ -86,29 +86,28 @@ const UserProfile = () => {
             variables: { _id: userid },
             setter: setUserDetails,
           },
+          {
+            query: `
+            query GetSuccessStoriesByUser($user_id: ID!) {
+              getSuccessStoriesByUser(user_id: $user_id) {
+                id
+                petName
+                description
+                petPhotoUrl
+              }
+            }
+          `,
+            variables: { user_id: userid },
+            setter: setSuccessStories,
+          },
         ];
-        // {
-        //   query: `
-        //     query GetSuccessStoriesByUser($user_id: ID!) {
-        //       getSuccessStoriesByUser(user_id: $user_id) {
-        //         _id
-        //         story_title
-        //         story_content
-        //         story_date
-        //       }
-        //     }
-        //   `,
-        //   variables: { user_id: userid },
-        //   setter: setSuccessStories,
-        // },
-
 
         for (const { query, variables, setter } of queries) {
           const response = await graphQLFetch(query, variables);
           if (!response) {
             throw new Error("Failed to fetch details.");
           }
-          setter(response.getLostPetsByUser || response.getAllPetsByUser || response.getUserDetails);
+          setter(response.getLostPetsByUser || response.getAllPetsByUser || response.getUserDetails || response.getSuccessStoriesByUser);
         }
       } catch (error) {
         console.error("Error fetching details:", error);
@@ -404,37 +403,41 @@ const UserProfile = () => {
                   <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     {adoptionDetails.length > 0 ? (
                       adoptionDetails.map((adoption) => (
-                        <div
-                          key={adoption._id}
-                          className="bg-primary-white rounded-lg shadow-md overflow-hidden transform transition duration-500 hover:shadow-lg hover:-translate-y-2"
-                        >
-                          {adoption.pet_image && (
-                            <img
-                              src={adoption.pet_image}
-                              alt={adoption.pet_name}
-                              className="w-full h-48 object-cover rounded-t-md mb-4"
-                            />
-                          )}
-                          <div className="p-4">
-                            <h2 className="text-xl font-semibold text-primary-dark mb-2">{adoption.pet_name}</h2>
-                            <h3 className="text-sm text-primary-dark mb-2">Age: {adoption.pet_age}</h3>
-                            <h3 className="text-sm text-primary-dark mb-2">Breed: {adoption.pet_breed}</h3>
-                            <h3 className="text-sm text-primary-dark mb-2">Pet Behaviour: {adoption.pet_behaviour}</h3>
-                            <div className="flex justify-start mt-4 space-x-2">
-                              <a
-                                href="adoptdataform"
-                                className="inline-block rounded text-sm bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
-                              >
-                                Edit
-                              </a>
-                              <button
-                                className="inline-block rounded text-sm bg-red-500 border-red-600 py-2 px-4 font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring transition duration-200"
-                              >
-                                Delete
-                              </button>
+                        adoption ? (
+                          <div
+                            key={adoption._id}
+                            className="bg-primary-white rounded-lg shadow-md overflow-hidden transform transition duration-500 hover:shadow-lg hover:-translate-y-2"
+                          >
+                            {adoption.pet_image && (
+                              <img
+                                src={adoption.pet_image}
+                                alt={adoption.pet_name}
+                                className="w-full h-48 object-cover rounded-t-md mb-4"
+                              />
+                            )}
+                            <div className="p-4">
+                              <h2 className="text-xl font-semibold text-primary-dark mb-2">{adoption.pet_name}</h2>
+                              <h3 className="text-sm text-primary-dark mb-2">Age: {adoption.pet_age}</h3>
+                              <h3 className="text-sm text-primary-dark mb-2">Type: {adoption.pet_type}</h3>
+                              <h3 className="text-sm text-primary-dark mb-2">Pet Behaviour: {adoption.pet_behaviour}</h3>
+                              <div className="flex justify-start mt-4 space-x-2">
+                                <a
+                                  href="adoptdataform"
+                                  className="inline-block rounded text-sm bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
+                                >
+                                  Edit
+                                </a>
+                                <button
+                                  className="inline-block rounded text-sm bg-red-500 border-red-600 py-2 px-4 font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring transition duration-200"
+                                >
+                                  Delete
+                                </button>
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        ) : (
+                          <p className="text-primary-dark">Some adoption details are missing or incorrect.</p>
+                        )
                       ))
                     ) : (
                       <p className="text-primary-dark">No adoption details posted yet.</p>
@@ -475,7 +478,6 @@ const UserProfile = () => {
                           <div className="p-4">
                             <h2 className="text-xl font-semibold text-primary-dark mb-2">{pet.pet_name}</h2>
                             <h3 className="text-sm text-primary-dark mb-2">Type: {pet.pet_type}</h3>
-                            <h3 className="text-sm text-primary-dark mb-2">Breed: {pet.pet_breed}</h3>
                             <h3 className="text-sm text-primary-dark mb-2">Last Seen Location: {pet.last_seen_location}</h3>
                             <h3 className="text-sm text-primary-dark mb-2">Last Seen Date: {new Date(pet.last_seen_date).toLocaleDateString()}</h3  >
                             <div className="flex justify-start mt-4 space-x-4">
@@ -500,13 +502,46 @@ const UserProfile = () => {
                   </div>
                 </div>
               )}
-              {/* Step 4: Share Your Story */}
+              {/* Step 4: Success Stories */}
               {currentStep === 4 && (
-                <div className="w-full px-4 py-6">
-                  <h2 className="text-xl font-semibold mb-4">Share Your Story</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Success stories form fields */}
+                <div className="md:w-[88%] xs:w-[92%] px-4 py-6">
+                  <div className="flex items-center mb-4">
+                    <p className="text-lg text-gray-700 mr-3">
+                      Want to share your success story...
+                    </p>
+                    <a
+                      href="successstoriesform"
+                      className="inline-block rounded text-lg bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
+                    >
+                      Share Your Story
+                    </a>
                   </div>
+                  {successStories.length > 0 ? (
+                    <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                      {successStories.map((story) => (
+                        <div key={story._id} className="border p-4 rounded-lg shadow-lg">
+                          <img src={story.petPhotoUrl} alt={story.petName} className="w-full h-64 object-cover mb-2 rounded-lg" />
+                          <h2 className="text-xl font-semibold mb-2">{story.petName}</h2>
+                          <p><strong>Description:</strong> {story.description}</p>
+                          <div className="flex justify-start mt-4 space-x-4">
+                            <a
+                              href="successstoryform"
+                              className="inline-block rounded text-sm bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
+                            >
+                              Edit
+                            </a>
+                            <button
+                              className="inline-block rounded text-sm bg-red-500 border-red-600 py-2 px-4 font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring transition duration-200"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500">No success stories available.</p>
+                  )}
                 </div>
               )}
             </div>

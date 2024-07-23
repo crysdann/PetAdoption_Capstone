@@ -6,6 +6,7 @@ const { createUser, loginUser, getUserDetails } = require("./users.js");
 const {
   createSuccessStory,
   getSuccessStories,
+  getSuccessStoriesByUser,
 } = require("./successstories.js");
 require("dotenv").config();
 
@@ -16,6 +17,7 @@ const resolvers = {
     getLostPets: getLostPets,
     getLostPetsByUser: getLostPetsByUser,
     getSuccessStories: getSuccessStories,
+    getSuccessStoriesByUser: getSuccessStoriesByUser,
     getUserDetails: getUserDetails,
     getPetDetails: getPetDetails,
   },
