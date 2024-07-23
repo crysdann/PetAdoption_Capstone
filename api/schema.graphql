@@ -92,9 +92,12 @@ input LostPetInput {
 
 type Query {
   getAllPets: [Pet]
+  getAllPetsByUser(user_id: ID!): [Pet]
   getSuccessStories: [SuccessStory!]
   getLostPets: [LostPet]
   getLostPetsByUser(user_id: ID!): [LostPet]
+  getUserDetails(_id: ID!): User
+  
 }
 
 type Mutation {
@@ -109,4 +112,5 @@ type Mutation {
   addLostPet(input: LostPetInput!): LostPet!
   createUser(user: UserInput): User!
   loginUser(email: String!, password: String!): User!
+  
 }

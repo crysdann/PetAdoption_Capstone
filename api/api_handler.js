@@ -1,8 +1,8 @@
 const fs = require("fs");
 const { ApolloServer } = require("apollo-server-express");
-const { createPet, insertImg, getAllPets } = require("./pets.js");
-const { addLostPet, getLostPets } = require("./lostpets.js");
-const { createUser, loginUser } = require("./users.js");
+const { createPet, insertImg, getAllPets, getAllPetsByUser } = require("./pets.js");
+const { addLostPet, insertPetImg, getLostPets, getLostPetsByUser } = require("./lostpets.js")
+const { createUser, loginUser, getUserDetails } = require("./users.js");
 const {
   createSuccessStory,
   getSuccessStories,
@@ -12,12 +12,16 @@ require("dotenv").config();
 const resolvers = {
   Query: {
     getAllPets: getAllPets,
+    getAllPetsByUser: getAllPetsByUser,
     getLostPets: getLostPets,
+    getLostPetsByUser: getLostPetsByUser,
     getSuccessStories: getSuccessStories,
+    getUserDetails: getUserDetails,
   },
   Mutation: {
     createPet: createPet,
     insertImg: insertImg,
+    insertPetImg: insertPetImg,
     createSuccessStory: createSuccessStory,
     addLostPet: addLostPet,
     createUser: createUser,

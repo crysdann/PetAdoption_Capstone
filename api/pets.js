@@ -2,7 +2,7 @@ const { getDb, getCurrentPetCount } = require("./db");
 
 
 ///creating new pet record
-async function createPet(_, { pet}) {
+async function createPet(_, { pet }) {
   try {
     const db = getDb();
     //get the current pet count from counters
@@ -22,7 +22,7 @@ async function createPet(_, { pet}) {
 
 async function insertImg(_, { img }) {
   try {
-    const db = getDb();   
+    const db = getDb();
     // Insert image data into MongoDB
     const newImg = await db.collection("images").insertOne(img);
     console.log("Image inserted successfully:", newImg.insertedId);
@@ -70,9 +70,44 @@ const getAllPets = async () => {
   }
 };
 
+// Function to get lost pets by user ID
+const getAllPetsByUser = async (_, { user_id }) => {
+  try {
+    const db = getDb();
+    // Query lost pets by user_id
+    const pets = await db.collection("pets").find({ user_id }).toArray();
 
+    if (pets.length === 0) {
+      console.log("No pets found for the given user_id.");
+      return [];
+    }
+
+    // Map over each pet to fetch its associated images as an array of strings
+    const petsWithImages = await Promise.all(pets.map(async (pet) => {
+      const petId = pet._id.toString(); // Convert ObjectId to string
+      console.log("Processing petId:", petId);
+
+      // Fetch images associated with the petId as a string
+      const images = await db.collection("images").find({ petId }).toArray();
+      console.log("Fetched images for petId", petId, images); // Detailed debug log
+
+      const imageUrls = images.map(image => image.url);
+      console.log("Image URLs for petId", petId, imageUrls.length); // Detailed debug log
+
+      return {
+        ...pet,
+        pet_image: imageUrls,
+      };
+    }));
+
+    return petsWithImages;
+  } catch (err) {
+    console.error("Error fetching pets with images:", err);
+    throw err;
+  }
+};
 
 //export modules
 module.exports = {
-  createPet,insertImg,getAllPets
+  createPet, insertImg, getAllPets, getAllPetsByUser
 };

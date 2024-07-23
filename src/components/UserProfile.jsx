@@ -1,26 +1,142 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import graphQLFetch from "../graphQLFetch";
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 
 const UserProfile = () => {
+  const [lostPets, setLostPets] = useState([]);
+  const [adoptionDetails, setAdoptionDetails] = useState([]);
+  const [successStories, setSuccessStories] = useState([]);
+  const [userDetails, setUserDetails] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
-  const [hasPostedAdoption, setHasPostedAdoption] = useState(false);
-  const [hasPostedLost, setHasPostedLost] = useState(false);
-  const [hasPostedSuccess, setHasPostedSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const showStep = (step) => {
     setCurrentStep(step);
   };
 
-  const nextStep = () => {
-    if (currentStep < 4) {
-      setCurrentStep(currentStep + 1);
-    }
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        const userid = localStorage.getItem("user_id");
+        if (!userid) {
+          throw new Error("User not logged in.");
+        }
+
+        const queries = [
+          {
+            query: `
+              query GetLostPetsByUser($user_id: ID!) {
+                        getLostPetsByUser(user_id: $user_id) {
+                            _id
+                            pet_name
+                            pet_type
+                            pet_breed
+                            last_seen_location
+                            last_seen_date
+                            contact_name
+                            contact_phone
+                            contact_email
+                            additional_info
+                            pet_image
+                        }
+                    }
+            `,
+            variables: { user_id: userid },
+            setter: setLostPets,
+          },
+          {
+            query: `
+              query GetAllPetsByUser($user_id: ID!) {
+                getAllPetsByUser(user_id: $user_id) {
+                  _id
+          pet_name
+          pet_type
+          pet_age
+          pet_gender
+          vaccination_details
+          health_issues
+          pet_behaviour
+          pet_description   
+          pet_image   
+          pet_video
+                }
+              }
+            `,
+            variables: { user_id: userid },
+            setter: setAdoptionDetails,
+          },
+          {
+            query: `
+              query GetUserDetails($_id: ID!) {
+                getUserDetails(_id: $_id) {
+                  _id
+                  first_name
+                  last_name
+                  email
+                  phone
+                  password
+                }
+              }
+            `,
+            variables: { _id: userid },
+            setter: setUserDetails,
+          },
+        ];
+        // {
+        //   query: `
+        //     query GetSuccessStoriesByUser($user_id: ID!) {
+        //       getSuccessStoriesByUser(user_id: $user_id) {
+        //         _id
+        //         story_title
+        //         story_content
+        //         story_date
+        //       }
+        //     }
+        //   `,
+        //   variables: { user_id: userid },
+        //   setter: setSuccessStories,
+        // },
+
+
+        for (const { query, variables, setter } of queries) {
+          const response = await graphQLFetch(query, variables);
+          if (!response) {
+            throw new Error("Failed to fetch details.");
+          }
+          setter(response.getLostPetsByUser || response.getAllPetsByUser || response.getUserDetails);
+        }
+      } catch (error) {
+        console.error("Error fetching details:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDetails();
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value, type, files } = e.target;
+    setUserDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: type === 'file' ? files[0] : value,
+    }));
   };
 
-  const previousStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
+  const handleUpdate = () => {
+    // Handle update logic here
   };
+
+  const refreshPage = () => {
+    window.location.reload();
+  };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <div className="pt-[9.1rem] pb-[2rem]">
@@ -37,9 +153,8 @@ const UserProfile = () => {
               {/* About Me */}
               <div
                 id="about_me"
-                className={`text-gray-900 rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${
-                  currentStep === 1 ? "bg-primary-brown  text-white" : ""
-                }`}
+                className={`text-gray-900 rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${currentStep === 1 ? "bg-primary-brown  text-white" : ""
+                  }`}
                 onClick={() => showStep(1)}>
                 <div className="flex md:gap-2 sm:text-xl xs:text-md font-semibold dark:text-white">
                   About Me
@@ -49,9 +164,8 @@ const UserProfile = () => {
               {/* Adoption */}
               <div
                 id="Adoption"
-                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${
-                  currentStep === 2 ? "bg-primary-brown  text-white" : ""
-                }`}
+                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${currentStep === 2 ? "bg-primary-brown  text-white" : ""
+                  }`}
                 onClick={() => showStep(2)}>
                 <div className="flex md:gap-2 sm:text-xl xs:text-md font-semibold dark:text-white">
                   Adoption Details
@@ -61,9 +175,8 @@ const UserProfile = () => {
               {/* Lost Pets */}
               <div
                 id="lost_pets"
-                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${
-                  currentStep === 3 ? "bg-primary-brown  text-white" : ""
-                }`}
+                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${currentStep === 3 ? "bg-primary-brown  text-white" : ""
+                  }`}
                 onClick={() => showStep(3)}>
                 <div className="flex md:gap-2 sm:text-xl xs:text-md font-semibold dark:text-white">
                   Find your lost pets
@@ -72,9 +185,8 @@ const UserProfile = () => {
               {/* Success Stories */}
               <div
                 id="success_stories"
-                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${
-                  currentStep === 4 ? "bg-primary-brown  text-white" : ""
-                }`}
+                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${currentStep === 4 ? "bg-primary-brown  text-white" : ""
+                  }`}
                 onClick={() => showStep(4)}>
                 <div className="flex md:gap-2 sm:text-xl xs:text-md font-semibold dark:text-white">
                   Share your story
@@ -90,9 +202,7 @@ const UserProfile = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* First Name */}
                     <div className="w-full">
-                      <label
-                        htmlFor="first_name"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      <label htmlFor="first_name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         First Name
                       </label>
                       <input
@@ -100,7 +210,8 @@ const UserProfile = () => {
                         name="first_name"
                         id="first_name"
                         className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        required
+                        value={userDetails.first_name || ""}
+                        onChange={handleChange}
                       />
                     </div>
                     {/* Last Name */}
@@ -115,7 +226,8 @@ const UserProfile = () => {
                         name="last_name"
                         id="last_name"
                         className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        required
+                        value={userDetails.last_name || ""}
+                        onChange={handleChange}
                       />
                     </div>
                     {/* Profile Picture */}
@@ -178,7 +290,8 @@ const UserProfile = () => {
                         name="email"
                         id="email"
                         className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        required
+                        value={userDetails.email || ""}
+                        onChange={handleChange}
                       />
                     </div>
                     {/* Phone Number */}
@@ -189,11 +302,12 @@ const UserProfile = () => {
                         Phone Number
                       </label>
                       <input
-                        type="text"
+                        type="tel"
                         name="phone"
                         id="phone"
                         className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        required
+                        value={userDetails.phone || ""}
+                        onChange={handleChange}
                       />
                     </div>
                     {/* Alternative Number */}
@@ -212,34 +326,53 @@ const UserProfile = () => {
                       />
                     </div>
                     {/* Change Password */}
-                    <div className="w-full mb-4">
-                      <label
-                        htmlFor="password"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    <div className="w-full mb-4 relative">
+                      <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Change Password
                       </label>
                       <input
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         name="password"
                         id="password"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        required
+                        className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        value={userDetails.password}
+                        onChange={handleChange}
                       />
+                      <div
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                        style={{ top: '1.75rem' }}
+                      >
+                        {showPassword ? (
+                          <EyeSlashIcon className="h-5 w-5 text-gray-500" />
+                        ) : (
+                          <EyeIcon className="h-5 w-5 text-gray-500" />
+                        )}
+                      </div>
                     </div>
                     {/* Confirm Password */}
-                    <div className="w-full mb-4">
-                      <label
-                        htmlFor="confirm_password"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    <div className="w-full mb-4 relative">
+                      <label htmlFor="confirm_password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Confirm Password
                       </label>
                       <input
-                        type="password"
+                        type={showConfirmPassword ? 'text' : 'password'}
                         name="confirm_password"
                         id="confirm_password"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         required
                       />
+                      <div
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                        style={{ top: '1.75rem' }}
+                      >
+                        {showPassword ? (
+                          <EyeSlashIcon className="h-5 w-5 text-gray-500" />
+                        ) : (
+                          <EyeIcon className="h-5 w-5 text-gray-500" />
+                        )}
+                      </div>
                     </div>
                     {/* Update  Button */}
                     <button
@@ -251,27 +384,58 @@ const UserProfile = () => {
                 </div>
               )}
 
+
               {/* Step 2: Adoption */}
               {currentStep === 2 && (
                 <div className="md:w-[88%] xs:w-[92%] px-4 py-6">
-                  <div className="flex items-center  mb-4">
+                  <div className="flex items-center mb-4">
                     <p className="text-lg text-gray-700 mr-3">
-                      Want to post any pets for adoption...{" "}
+                      Want to post any pets for adoption...
                     </p>
-                    <Link
-                      to="/adoptdataform"
-                      className="inline-block rounded text-lg bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200">
+                    <a
+                      href="adoptdataform"
+                      className="inline-block rounded text-lg bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
+                    >
                       Add Adoption
-                    </Link>
+                    </a>
                   </div>
-                  <div className="grid grid-cols-1 gap-4 mt-8">
-                    {hasPostedAdoption ? (
-                      <div className="p-4 bg-gray-100 rounded-md shadow-md">
-                        {/* Adoption details card */}
-                        <p>Adoption details go here...</p>
-                      </div>
+                  <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    {adoptionDetails.length > 0 ? (
+                      adoptionDetails.map((adoption) => (
+                        <div
+                          key={adoption._id}
+                          className="bg-primary-white rounded-lg shadow-md overflow-hidden transform transition duration-500 hover:shadow-lg hover:-translate-y-2"
+                        >
+                          {adoption.pet_image && (
+                            <img
+                              src={adoption.pet_image}
+                              alt={adoption.pet_name}
+                              className="w-full h-48 object-cover rounded-t-md mb-4"
+                            />
+                          )}
+                          <div className="p-4">
+                            <h2 className="text-xl font-semibold text-primary-dark mb-2">{adoption.pet_name}</h2>
+                            <h3 className="text-sm text-primary-dark mb-2">Age: {adoption.pet_age}</h3>
+                            <h3 className="text-sm text-primary-dark mb-2">Breed: {adoption.pet_breed}</h3>
+                            <h3 className="text-sm text-primary-dark mb-2">Pet Behaviour: {adoption.pet_behaviour}</h3>
+                            <div className="flex justify-start mt-4 space-x-2">
+                              <a
+                                href="adoptdataform"
+                                className="inline-block rounded text-sm bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
+                              >
+                                Edit
+                              </a>
+                              <button
+                                className="inline-block rounded text-sm bg-red-500 border-red-600 py-2 px-4 font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring transition duration-200"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))
                     ) : (
-                      <p>No adoption details posted yet.</p>
+                      <p className="text-primary-dark">No adoption details posted yet.</p>
                     )}
                   </div>
                 </div>
@@ -280,51 +444,66 @@ const UserProfile = () => {
               {/* Step 3: Lost Pets */}
               {currentStep === 3 && (
                 <div className="md:w-[88%] xs:w-[92%] px-4 py-6">
-                  <div className="flex items-center  mb-4">
+                  <div className="flex items-center mb-4">
                     <p className="text-lg text-gray-700 mr-3">
-                      Havent found your pets yet...{" "}
+                      Haven't found your pets yet...
                     </p>
                     <a
                       href="LostPetForm"
-                      className="inline-block rounded text-lg bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200">
+                      className="inline-block rounded text-lg bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
+                    >
                       Add Lost Pet
                     </a>
                   </div>
-                  <div className="grid grid-cols-1 gap-4 mt-8">
-                    {hasPostedLost ? (
-                      <div className="p-4 bg-gray-100 rounded-md shadow-md">
-                        {/* Lost pet details card */}
-                        <p>Lost pet details go here...</p>
-                      </div>
+                  <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    {lostPets.length > 0 ? (
+                      lostPets.map((pet) => (
+                        <div
+                          key={pet._id}
+                          className="bg-primary-white rounded-lg shadow-md overflow-hidden transform transition duration-500 hover:shadow-lg hover:-translate-y-2"
+                        >
+
+                          {pet.pet_image && (
+                            <img
+                              src={pet.pet_image}
+                              alt={pet.pet_name}
+                              className="w-full h-48 object-cover rounded-t-md mb-4"
+                            />
+                          )}
+                          <div className="p-4">
+                            <h2 className="text-xl font-semibold text-primary-dark mb-2">{pet.pet_name}</h2>
+                            <h3 className="text-sm text-primary-dark mb-2">Type: {pet.pet_type}</h3>
+                            <h3 className="text-sm text-primary-dark mb-2">Breed: {pet.pet_breed}</h3>
+                            <h3 className="text-sm text-primary-dark mb-2">Last Seen Location: {pet.last_seen_location}</h3>
+                            <h3 className="text-sm text-primary-dark mb-2">Last Seen Date: {new Date(pet.last_seen_date).toLocaleDateString()}</h3  >
+                            <div className="flex justify-start mt-4 space-x-4">
+                              <a
+                                href="LostPetForm"
+                                className="inline-block rounded text-sm bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
+                              >
+                                Edit
+                              </a>
+                              <button
+                                className="inline-block rounded text-sm bg-red-500 border-red-600 py-2 px-4 font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring transition duration-200"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))
                     ) : (
-                      <p>No lost pet details posted yet.</p>
+                      <p className="text-primary-dark">No lost pets found.</p>
                     )}
                   </div>
                 </div>
               )}
-
-              {/* Step 4: Success Stories */}
+              {/* Step 4: Share Your Story */}
               {currentStep === 4 && (
-                <div className="md:w-[88%] xs:w-[92%] px-4 py-6">
-                  <div className="flex items-center  mb-4">
-                    <p className="text-lg text-gray-700 mr-3">
-                      Help others with your stories...{" "}
-                    </p>
-                    <Link
-                      to="/SuccessStoriesForm"
-                      className="inline-block rounded text-lg bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200">
-                      Add SuccessStories
-                    </Link>
-                  </div>
-                  <div className="grid grid-cols-1 gap-4 mt-8">
-                    {hasPostedSuccess ? (
-                      <div className="p-4 bg-gray-100 rounded-md shadow-md">
-                        {/* Success story details card */}
-                        <p>Success story details go here...</p>
-                      </div>
-                    ) : (
-                      <p>No success story details posted yet.</p>
-                    )}
+                <div className="w-full px-4 py-6">
+                  <h2 className="text-xl font-semibold mb-4">Share Your Story</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Success stories form fields */}
                   </div>
                 </div>
               )}
@@ -332,7 +511,7 @@ const UserProfile = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
