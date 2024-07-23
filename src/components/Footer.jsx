@@ -18,12 +18,12 @@ const Footer = () => {
   return (
     <div>
       <div className="w-full min-h-[150px] bg-primary-dark text-white  sm:flex-row justify-center items-center">
-        <h1 className="sm: text-4xl flex justify-center items-center p-8">
+        <h1 className="text-xl sm:text-2xl md:text-4xl flex justify-center items-center p-8">
           Contact Us
         </h1>
         <div className="w-full min-h-[150px] bg-primary-dark text-white flex flex-row sm:flex-col justify-center items-center text-1xl">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full max-w-4xl">
-            <div className="flex flex-col space-y-4 p-6 items-center sm:items-start">
+            <div className="text-xl sm:text-2xl md:text-4xl flex flex-col space-y-4 p-6 items-center sm:items-start">
               <div className="flex items-center">
                 <IoLocationOutline className="mr-2 w-6 h-6" />
                 <h2>PetConnect, Waterloo, Ontario, Canada</h2>
@@ -80,7 +80,7 @@ const Footer = () => {
                 {/* <button className="w-full bg-primary-light-brown p-2 rounded font-bold text-xl hover:bg-primary-brown hover:border-[#866552] hover:text-white transition duration-200">
                   Submit
                 </button> */}
-                <button className="w-full p-2">Submit</button>
+                <button className="w-full p-1 sm:p-2">Submit</button>
               </form>
             </div>
           </div>
