@@ -10,17 +10,17 @@ function Items({ currentItems }) {
       {currentItems &&
         currentItems.map((item, index) => (
           <div
-            className="rounded-xl relative md:custom-grid-item h-[200px]"
+            className="rounded-xl relative h-[130px] md:h-[155px]  lg:custom-grid-item  lg:h-[200px]"
             key={index}>
             <div className="bg-white shadow-md text-[#5e5e5b] grid grid-cols-4 cursor-pointer transform transition-transform duration-300 hover:scale-105 h-[100%]">
-              <div className="col-span-2 md:col-span-1 flex overflow-hidden">
+              <div className="col-span-1 md:col-span-1 flex overflow-hidden">
                 <img
                   src={item.petPhotoUrl}
                   alt="adoptedPets"
                   className="w-full object-cover"
                 />
               </div>
-              <div className="col-span-2 md:col-span-3 flex flex-col h-full overflow-hidden">
+              <div className="col-span-3 md:col-span-3 flex flex-col h-full overflow-hidden">
                 <h2 className="flex justify-center mt-[1rem] mb-[1rem] text-primary-brown">
                   {item.petName}
                 </h2>
