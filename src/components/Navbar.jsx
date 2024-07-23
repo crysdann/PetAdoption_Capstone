@@ -2,28 +2,47 @@ import React, { useState, useEffect } from "react";
 import { FaBars } from "react-icons/fa";
 import { FaRegUser } from "react-icons/fa6";
 import PetConnect from "../assets/images/petconnectlogo.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoSearch } from "react-icons/io5";
 
 const Navbar = () => {
   const [nav, setNav] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userType, setUserType] = useState("");
+  const navigate = useNavigate();
+
   const handleNav = () => {
     setNav(!nav);
   };
+
   const handleProfileDropdown = () => {
     setProfileDropdown(!profileDropdown);
   };
-  const handleLogout = () => {
-    localStorage.removeItem("user_id");
-    setIsLoggedIn(false);
+
+  const handleProfileClick = () => {
+    if (userType === 'admin') {
+      navigate('/adminprofile'); // Ensure this route is properly set up
+    } else {
+      navigate('/UserProfile'); // Ensure this route is properly set up
+    }
     setProfileDropdown(false);
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("user_type");
+    setIsLoggedIn(false);
+    setUserType("");
+    setProfileDropdown(false);
+  };
+
   useEffect(() => {
     const userId = localStorage.getItem("user_id");
+    const userType = localStorage.getItem("user_type");
     if (userId) {
       setIsLoggedIn(true);
+      setUserType(userType || "");
     }
     const handleClickOutside = (event) => {
       if (
@@ -45,7 +64,7 @@ const Navbar = () => {
       <div className="w-full min-h-[50px] flex justify-between items-center absolute z-10 bg-primary-white px-4">
         <div>
           <Link to="/">
-            <img src={PetConnect} alt="logo" style={{ width: "6rem" }}></img>
+            <img src={PetConnect} alt="logo" style={{ width: "6rem" }} />
           </Link>
         </div>
         <ul className="hidden sm:flex font-bold flex-grow justify-center">
@@ -67,11 +86,6 @@ const Navbar = () => {
           <li className="p-4 text-lg">
             <Link to="/successstories" className="hover:text-primary-brown">
               Success Stories
-            </Link>
-          </li>
-          <li className="p-4 text-lg">
-            <Link to="/adminprofile" className="hover:text-primary-brown">
-              Admin Profile
             </Link>
           </li>
           {isLoggedIn ? (
@@ -116,9 +130,6 @@ const Navbar = () => {
               <Link to="/successstories">Success Stories</Link>
             </li>
             <li className="p-4 text-2xl py-8" onClick={handleNav}>
-              <Link to="/adminprofile"> Admin Profile </Link>
-            </li>
-            <li className="p-4 text-2xl py-8" onClick={handleNav}>
               <Link to="/login"> Login </Link>
             </li>
           </ul>
@@ -141,21 +152,26 @@ const Navbar = () => {
           </div>
         </form>
         <div
-          className="text-2xl hover:text-primary-brown hover:bg-primary-white transition duration-300  cursor-pointer ml-4 mr-4 border rounded-3xl border-gray w-[3rem] h-[3rem] flex justify-center items-center 
-          user-profile-icon"
+          className="text-2xl hover:text-primary-brown hover:bg-primary-white transition duration-300 cursor-pointer ml-4 mr-4 border rounded-3xl border-gray w-[3rem] h-[3rem] flex justify-center items-center user-profile-icon"
           onClick={handleProfileDropdown}>
           <FaRegUser />
         </div>
-        {profileDropdown && (
+        {profileDropdown && isLoggedIn && (
           <div className="flex flex-col z-10 absolute top-[5rem] right-[1rem] w-[120px] rounded-2xl border-[1px] userprofiledropdown bg-primary-light-brown opacity-85">
             <ul className="flex flex-col text-[17px]">
-              <li className="p-[10px] border-b border-white hover:text-primary-white cursor-pointer">
-                <Link to="/UserProfile">Profile</Link>
+              <li
+                className="p-[10px] border-b border-white hover:text-primary-white cursor-pointer"
+                onClick={handleProfileClick}
+              >
+                Profile
               </li>
               <li className="p-[10px] border-b border-white hover:text-primary-white cursor-pointer">
                 Settings
               </li>
-              <li className="p-[10px] hover:text-primary-white cursor-pointer">
+              <li
+                className="p-[10px] hover:text-primary-white cursor-pointer"
+                onClick={handleLogout}
+              >
                 Logout
               </li>
             </ul>

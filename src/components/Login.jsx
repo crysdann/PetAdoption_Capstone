@@ -37,7 +37,8 @@ const Login = () => {
       const query = `
         mutation {
           loginUser(email: "${data.email}", password: "${data.password}") {
-            _id    
+            _id   
+            user_type 
           }
         }
       `;
@@ -47,8 +48,8 @@ const Login = () => {
 
       if (result) {
         // Redirect or perform actions upon successful login
-        const userid = result.loginUser._id;
-        localStorage.setItem('user_id', userid); 
+        localStorage.setItem('user_id', result.loginUser._id); 
+        localStorage.setItem('user_type', result.loginUser.user_type);
         navigate('/');
       } else {
         setErrorMessage('Invalid email or password');
