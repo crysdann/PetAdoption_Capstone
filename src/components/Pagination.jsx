@@ -21,7 +21,7 @@ function Items({ currentItems }) {
                 />
               </div>
               <div className="col-span-3 md:col-span-3 flex flex-col h-full overflow-hidden">
-                <h2 className="flex justify-center mt-[1rem] mb-[1rem] text-primary-brown">
+                <h2 className="flex justify-center mt-[0.5rem] sm:mt-[1rem] sm:mb-[1rem] text-primary-brown">
                   {item.petName}
                 </h2>
                 <p className="pl-[1rem] pr-[1rem] multi-line-ellipsis">
