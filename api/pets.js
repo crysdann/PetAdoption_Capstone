@@ -1,4 +1,5 @@
 const { getDb, getCurrentPetCount } = require("./db");
+const { ObjectId } = require("mongodb");
 
 
 ///creating new pet record
@@ -107,7 +108,40 @@ const getAllPetsByUser = async (_, { user_id }) => {
   }
 };
 
+//get details of a pet using id
+async function getPetDetails(_, { petId }) {
+  try {
+    const db = getDb();
+    console.log(petId);
+
+    const petIdObjectId = new ObjectId(petId); // Convert to ObjectId if needed
+    const pet_detail = await db
+      .collection("pets")
+      .findOne({ _id: petIdObjectId });
+      console.log(pet_detail);
+
+    if (!pet_detail) {
+      console.log("No pets found in the database.");
+      return null;
+    }
+
+    // Fetch images associated with the petId as a string
+    const images = await db.collection("images").find({ petId }).toArray();
+
+    const imageUrls = images.map((image) => image.url);
+
+    const petWithImages = {
+      ...pet_detail,
+      pet_image: imageUrls,
+    };
+
+    return petWithImages;
+  } catch (err) {
+    console.error("Error in getPetDetails():", err);
+  }
+}
+
 //export modules
 module.exports = {
-  createPet, insertImg, getAllPets, getAllPetsByUser
+  createPet, insertImg, getAllPets, getAllPetsByUser, getPetDetails
 };

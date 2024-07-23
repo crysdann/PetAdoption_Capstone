@@ -35,20 +35,20 @@ function Banner() {
             explore the bios and photos of the animals below.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-4 text-center">
+          <div className="mt-8 flex justify-center gap-4 ">
             <a
-              href="/successstories"
+              href="/adoptdataform"
               className="block w-full rounded bg-rose-600 px-12 py-3 text-sm font-medium text-white shadow hover:bg-rose-700 focus:outline-none focus:ring active:bg-rose-500 sm:w-auto"
             >
-              Success Stories
+              Add to Adoption
             </a>
 
-            <a
+            {/* <a
               href="#"
               className="block w-full rounded bg-white px-12 py-3 text-sm font-medium text-rose-600 shadow hover:text-rose-700 focus:outline-none focus:ring active:text-rose-500 sm:w-auto"
             >
               Learn More
-            </a>
+            </a> */}
           </div>
         </div>
       </div>
@@ -273,7 +273,9 @@ const AdoptionList = () => {
             pet_type
             pet_age
             pet_gender
-            vaccination_details
+            pet_breed
+            vaccination_status
+            location
             health_issues
             pet_behaviour
             pet_description

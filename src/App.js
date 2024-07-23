@@ -28,7 +28,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="adopt" element={<AdoptionList />} />
         <Route path="adopt/:filter" element={<AdoptionList />} />
-        <Route path="petdetails" element={<PetDetails />} />
+        <Route path="petdetails/:petId" element={<PetDetails />} />
         <Route path="lostpets" element={<LostPets />} />
         <Route path="lostpets/:filter" element={<LostPets />} />
         <Route path="successstories" element={<SuccessStories />} />

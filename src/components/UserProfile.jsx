@@ -56,7 +56,9 @@ const UserProfile = () => {
           pet_type
           pet_age
           pet_gender
-          vaccination_details
+          pet_breed
+          vaccination_status
+          location
           health_issues
           pet_behaviour
           pet_description   
