@@ -1,76 +1,123 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useParams } from "react-router-dom";
 import graphQLFetch from "../graphQLFetch";
 import firebase from "firebase/compat/app";
 import "firebase/compat/storage";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-const AdoptForm = () => {
+const AdoptFormEdit = () => {
+  const navigate = useNavigate();
+  const { petId } = useParams(); // Get petId from URL parameters
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
+    setValue,
   } = useForm();
 
+  const [initialData, setInitialData] = useState(null);
+
+  useEffect(() => {
+    console.log("Inside useeffect");
+    if (petId) {
+      const fetchPetDetails = async () => {
+        const query = `
+          query {
+            getPetDetails(petId: "${petId}") {
+              _id
+              user_id
+              pet_name
+              pet_type
+              pet_age
+              pet_gender
+              pet_breed
+              vaccination_status
+              location
+              health_issues
+              pet_behaviour
+              pet_description
+              pet_image
+              pet_video
+            }
+          }
+        `;
+
+        try {
+          const response = await graphQLFetch(query);
+          if (response && response.getPetDetails) {
+            setInitialData(response.getPetDetails);
+            Object.keys(response.getPetDetails).forEach((key) => {
+              if (key === "pet_image") {
+                // 'pet_image' set it to null
+                setValue("floating_pet_image", null);
+              } else {
+                setValue(`floating_${key}`, response.getPetDetails[key]);
+              }
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching pet details:", error);
+          alert("Failed to fetch pet details.");
+        }
+      };
+
+      fetchPetDetails();
+    }
+  }, [petId, setValue]);
+
   const onSubmit = async (data) => {
-    // console.log("data", data);
-    // console.log(localStorage.getItem('user_id'));
     try {
       let files = data.floating_pet_image;
 
-      // Ensure files is an array
-      if (!Array.isArray(files)) {
-        files = Array.from(files); // Convert to array using Array.from()
+      if (files) {
+        if (!Array.isArray(files)) {
+          files = Array.from(files);
+        }
       }
 
       const images = [];
-      const userid = localStorage.getItem("user_id");
-      if (userid === null || userid === undefined || userid === "") {
-        alert("Please login to continue");
-      } else {
-        const query = `
-      mutation {
-        createPet(pet: {
-          user_id: "${userid}",
-          pet_name: "${data.floating_pet_name}",
-          pet_type: "${data.floating_pet_type}",
-          pet_age: ${data.floating_pet_age},
-          pet_gender: "${data.floating_pet_gender}",
-          pet_breed: "${data.floating_pet_breed}",          
-          vaccination_status: "${data.floating_pet_vaccine || ""}",
-          location: "${data.floating_location}",
-          health_issues: "${data.floating_health_issues || ""}",
-          pet_behaviour: "${data.floating_pet_behaviour || ""}",
-          pet_description: "${data.floating_pet_description || ""}",
-          pet_video: ""
-        }) {
-          _id
-          user_id
-          pet_name
-          pet_type
-          pet_age
-          pet_gender
-          pet_breed
-          vaccination_status
-          location
-          health_issues
-          pet_behaviour
-          pet_description   
-          pet_image   
-          pet_video
-        }
+      const query = `
+  mutation UpdatePet($id: ID!, $pet: petUpdateInput!) {
+    updatePet(id: $id, pet: $pet) {      
+      pet_age
+      pet_gender
+      pet_breed
+      vaccination_status
+      location
+      health_issues
+      pet_behaviour
+      pet_description
+      pet_image
+      pet_video
+    }
+  }
+`;
+      console.log(data);
+      const variables = {
+        id: petId,
+        pet: {
+          pet_age: data.floating_pet_age,
+          pet_gender: data.floating_pet_gender,
+          pet_breed: data.floating_pet_breed,
+          vaccination_status: data.floating_vaccination_status,
+          location: data.floating_location,
+          health_issues: data.floating_health_issues,
+          pet_behaviour: data.floating_pet_behaviour,
+          pet_description: data.floating_pet_description,
+          pet_video: "",
+        },
+      };
+
+      const response = await graphQLFetch(query, variables);
+
+      if (!response || !response.updatePet) {
+        throw new Error("Failed to update pet.");
       }
-    `;
 
-        const response = await graphQLFetch(query);
-
-        if (!response || !response.createPet) {
-          throw new Error("Failed to create pet.");
-        }
-
-        const petId = response.createPet._id;
-
-        // Upload images and insert their URLs in batches
+      if (files) {
         const uploadPromises = files.map(async (selectedFile) => {
           if (selectedFile) {
             const storageRef = firebase.storage().ref();
@@ -80,21 +127,16 @@ const AdoptForm = () => {
               const snapshot = await fileRef.put(selectedFile);
               const downloadURL = await snapshot.ref.getDownloadURL();
 
-              // Store the image URL in the images array
               images.push(downloadURL);
             } catch (error) {
               console.error("Error uploading file:", error);
               throw new Error("Failed to upload file.");
             }
-          } else {
-            console.log("No file selected.");
           }
         });
 
-        // Wait for all file uploads to complete
         await Promise.all(uploadPromises);
 
-        // Insert image URLs into the database in batches
         const insertPromises = images.map(async (imageUrl) => {
           const insertImgQuery = `
           mutation InsertImage($img: ImageInput!) {
@@ -124,39 +166,44 @@ const AdoptForm = () => {
           }
         });
 
-        // Wait for all database insertions to complete
         await Promise.all(insertPromises);
-
-        // Handle success
-        alert("Pet and images successfully registered for adoption.");
-        // Reset the form to its initial state
-        reset();
       }
+
+      alert("Pet details successfully updated.");
+      navigate("/UserProfile");
     } catch (error) {
-      console.error("Error registering pet and images:", error);
-      alert("Failed to register pet and images for adoption.");
+      console.error("Error updating pet details:", error);
+      alert("Failed to update pet details.");
     }
   };
+
+  if (!initialData)
+    return <div className="pt-[12rem] pb-[2rem] mx-9 sm:mx-15">Loading...</div>;
 
   return (
     <div className="pt-[12rem] pb-[2rem] mx-9 sm:mx-15">
       <h1 className="flex justify-center pt-4 pb-2 text-[2rem] sm:text-[3rem] font-bold text-[#644b3c] ">
-        Register pets for adoption
+        Edit Pet Details
       </h1>
       <p className="text-lg text-primary-dark mb-2">
-        Let's get started on finding a new home for your pet! Complete the form
-        below with all necessary details that help to understand your pet better
-        and find the right family for them.
-      </p>
-      <br></br>
+            Here you can manage your pet details. Please make sure to review the information before making any updates.
+          </p>
+          <br></br>
       <form
         className="max-w-3xl mx-auto bg-white shadow-md rounded px-8 pt-8 pb-8"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="grid md:grid-cols-2 md:gap-6">
           <div className="relative z-0 w-full mb-5 group">
+            <label
+              htmlFor="floating_pet_name"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Pet Name
+            </label>
             <input
               type="text"
+              readOnly
               id="floating_pet_name"
               className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
                 errors.floating_pet_name ? "border-red-500" : "border-gray-300"
@@ -166,12 +213,6 @@ const AdoptForm = () => {
                 required: "Pet name is required",
               })}
             />
-            {/* <label
-              htmlFor="floating_pet_name"
-              className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-            >
-              Pet name
-            </label> */}
             {errors.floating_pet_name && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.floating_pet_name.message}
@@ -179,6 +220,12 @@ const AdoptForm = () => {
             )}
           </div>
           <div className="relative z-0 w-full mb-5 group">
+            <label
+              htmlFor="floating_pet_type"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Pet Type
+            </label>
             <select
               id="floating_pet_type"
               className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
@@ -187,6 +234,7 @@ const AdoptForm = () => {
               {...register("floating_pet_type", {
                 required: "Pet type is required",
               })}
+              disabled
             >
               <option value="">Select Pet type</option>
               <option value="dog">Dog</option>
@@ -202,6 +250,12 @@ const AdoptForm = () => {
         </div>
         <div className="grid md:grid-cols-2 md:gap-6">
           <div className="relative z-0 w-full mb-5 group">
+            <label
+              htmlFor="floating_pet_age"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Pet Age
+            </label>
             <input
               type="number"
               id="floating_pet_age"
@@ -214,12 +268,6 @@ const AdoptForm = () => {
                 min: { value: 0, message: "Age must be a positive number" },
               })}
             />
-            {/* <label
-              htmlFor="floating_pet_age"
-              className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-            >
-              Pet age
-            </label> */}
             {errors.floating_pet_age && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.floating_pet_age.message}
@@ -227,6 +275,12 @@ const AdoptForm = () => {
             )}
           </div>
           <div className="relative z-0 w-full mb-5 group">
+            <label
+              htmlFor="floating_pet_gender"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Pet Gender
+            </label>
             <select
               id="floating_pet_gender"
               className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
@@ -249,6 +303,12 @@ const AdoptForm = () => {
         </div>
         <div className="grid md:grid-cols-2 md:gap-6">
           <div className="relative z-0 w-full mb-5 group">
+            <label
+              htmlFor="floating_pet_breed"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Pet Breed
+            </label>
             <input
               type="text"
               id="floating_pet_breed"
@@ -260,12 +320,6 @@ const AdoptForm = () => {
                 required: "Pet breed is required",
               })}
             />
-            {/* <label
-              htmlFor="floating_pet_name"
-              className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-            >
-              Pet name
-            </label> */}
             {errors.floating_pet_breed && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.floating_pet_breed.message}
@@ -273,12 +327,18 @@ const AdoptForm = () => {
             )}
           </div>
           <div className="relative z-0 w-full mb-5 group">
+            <label
+              htmlFor="floating_vaccination_status"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Vaccination status
+            </label>
             <select
-              id="floating_pet_vaccine"
+              id="floating_vaccination_status"
               className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
-                errors.floating_pet_vaccine ? "border-red-500" : ""
+                errors.floating_vaccination_status ? "border-red-500" : ""
               }`}
-              {...register("floating_pet_vaccine", {
+              {...register("floating_vaccination_status", {
                 required: "Pet Vaccination status is required",
               })}
             >
@@ -296,65 +356,67 @@ const AdoptForm = () => {
           </div>
         </div>
         <div className="relative z-0 w-full mb-5 group">
+          <label
+            htmlFor="floating_location"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Location
+          </label>
           <input
+            type="text"
             id="floating_location"
             className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
-              errors.floating_location ? "border-red-500" : ""
+              errors.floating_location ? "border-red-500" : "border-gray-300"
             }`}
             placeholder="Location"
             {...register("floating_location", {
               required: "Location is required",
             })}
           />
-
           {errors.floating_location && (
             <p className="text-red-500 text-sm mt-1">
               {errors.floating_location.message}
             </p>
           )}
         </div>
-
         <div className="relative z-0 w-full mb-5 group">
+          <label
+            htmlFor="floating_health_issues"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Health Issues
+          </label>
           <textarea
             id="floating_health_issues"
             className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
               errors.floating_health_issues ? "border-red-500" : ""
             }`}
             placeholder="Health issues"
-            {...register("floating_health_issues", {
-              required: "Health issues are required",
-            })}
-          ></textarea>
-          {/* <label
-            htmlFor="floating_health_issues"
-            className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-          >
-            Health issues
-          </label> */}
+            rows="3"
+            {...register("floating_health_issues")}
+          />
           {errors.floating_health_issues && (
             <p className="text-red-500 text-sm mt-1">
               {errors.floating_health_issues.message}
             </p>
           )}
         </div>
-
         <div className="relative z-0 w-full mb-5 group">
+          <label
+            htmlFor="floating_pet_behaviour"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Pet Behaviour
+          </label>
           <textarea
             id="floating_pet_behaviour"
             className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
               errors.floating_pet_behaviour ? "border-red-500" : ""
             }`}
             placeholder="Pet behaviour"
-            {...register("floating_pet_behaviour", {
-              required: "Pet behaviour is required",
-            })}
-          ></textarea>
-          {/* <label
-            htmlFor="floating_pet_behaviour"
-            className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-          >
-            Pet behaviour
-          </label> */}
+            rows="3"
+            {...register("floating_pet_behaviour")}
+          />
           {errors.floating_pet_behaviour && (
             <p className="text-red-500 text-sm mt-1">
               {errors.floating_pet_behaviour.message}
@@ -363,64 +425,57 @@ const AdoptForm = () => {
         </div>
 
         <div className="relative z-0 w-full mb-5 group">
+          <label
+            htmlFor="floating_pet_description"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Pet Description
+          </label>
           <textarea
             id="floating_pet_description"
             className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
               errors.floating_pet_description ? "border-red-500" : ""
             }`}
             placeholder="Pet description"
-            {...register("floating_pet_description", {
-              required: "Pet description is required",
-            })}
-          ></textarea>
-          {/* <label
-            htmlFor="floating_pet_description"
-            className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-          >
-            Pet description
-          </label> */}
+            rows="4"
+            {...register("floating_pet_description")}
+          />
           {errors.floating_pet_description && (
             <p className="text-red-500 text-sm mt-1">
               {errors.floating_pet_description.message}
             </p>
           )}
         </div>
-
         <div className="relative z-0 w-full mb-5 group">
+          <label
+            htmlFor="floating_pet_image"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Upload more Images
+          </label>
           <input
             type="file"
             id="floating_pet_image"
-            className={`w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
-              errors.floating_pet_image ? "border-red-500" : ""
-            }`}
-            placeholder="Pet images"
-            {...register("floating_pet_image", {
-              required: "Pet image is required",
-            })}
+            className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none"
+            {...register("floating_pet_image")}
             multiple
           />
-          {/* <label
-            htmlFor="floating_pet_image"
-            className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-          >
-            Pet image
-          </label> */}
-          {errors.floating_pet_image && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.floating_pet_image.message}
-            </p>
-          )}
         </div>
-
         <button
           type="submit"
           className="inline-block shrink-0 rounded-md border bg-primary-brown px-12 py-3 text-sm font-medium text-white transition focus:outline-none focus:ring active:text-blue-500"
         >
-          Submit
+          Update Pet
         </button>
+        <Link
+          to={`/UserProfile`}
+          className="inline-block shrink-0 rounded-md border bg-primary-light-brown mx-2 px-12 py-3 text-sm font-medium text-white transition focus:outline-none focus:ring active:text-blue-500"
+        >
+          Cancel
+        </Link>
       </form>
     </div>
   );
 };
 
-export default AdoptForm;
+export default AdoptFormEdit;

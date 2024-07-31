@@ -1,7 +1,6 @@
 const { getDb, getCurrentPetCount } = require("./db");
 const { ObjectId } = require("mongodb");
 
-
 ///creating new pet record
 async function createPet(_, { pet }) {
   try {
@@ -29,7 +28,9 @@ async function insertImg(_, { img }) {
     console.log("Image inserted successfully:", newImg.insertedId);
 
     // Retrieve the inserted image from MongoDB
-    const insertedImage = await db.collection("images").findOne({ _id: newImg.insertedId });
+    const insertedImage = await db
+      .collection("images")
+      .findOne({ _id: newImg.insertedId });
     return insertedImage;
   } catch (err) {
     console.error("Error inserting image:", err);
@@ -47,22 +48,24 @@ const getAllPets = async () => {
     }
 
     // Map over each pet to fetch its associated images as an array of strings
-    const petsWithImages = await Promise.all(pets.map(async (pet) => {
-      const petId = pet._id.toString(); // Convert ObjectId to string
-      console.log("Processing petId:", petId);
+    const petsWithImages = await Promise.all(
+      pets.map(async (pet) => {
+        const petId = pet._id.toString(); // Convert ObjectId to string
+        console.log("Processing petId:", petId);
 
-      // Fetch images associated with the petId as a string
-      const images = await db.collection("images").find({ petId }).toArray();
-      console.log("Fetched images for petId", petId, images); // Detailed debug log
+        // Fetch images associated with the petId as a string
+        const images = await db.collection("images").find({ petId }).toArray();
+        console.log("Fetched images for petId", petId, images); // Detailed debug log
 
-      const imageUrls = images.map(image => image.url);
-      console.log("Image URLs for petId", petId, imageUrls.length); // Detailed debug log
+        const imageUrls = images.map((image) => image.url);
+        console.log("Image URLs for petId", petId, imageUrls.length); // Detailed debug log
 
-      return {
-        ...pet,
-        pet_image: imageUrls,
-      };
-    }));
+        return {
+          ...pet,
+          pet_image: imageUrls,
+        };
+      })
+    );
 
     return petsWithImages;
   } catch (err) {
@@ -84,22 +87,24 @@ const getAllPetsByUser = async (_, { user_id }) => {
     }
 
     // Map over each pet to fetch its associated images as an array of strings
-    const petsWithImages = await Promise.all(pets.map(async (pet) => {
-      const petId = pet._id.toString(); // Convert ObjectId to string
-      console.log("Processing petId:", petId);
+    const petsWithImages = await Promise.all(
+      pets.map(async (pet) => {
+        const petId = pet._id.toString(); // Convert ObjectId to string
+        console.log("Processing petId:", petId);
 
-      // Fetch images associated with the petId as a string
-      const images = await db.collection("images").find({ petId }).toArray();
-      console.log("Fetched images for petId", petId, images); // Detailed debug log
+        // Fetch images associated with the petId as a string
+        const images = await db.collection("images").find({ petId }).toArray();
+        console.log("Fetched images for petId", petId, images); // Detailed debug log
 
-      const imageUrls = images.map(image => image.url);
-      console.log("Image URLs for petId", petId, imageUrls.length); // Detailed debug log
+        const imageUrls = images.map((image) => image.url);
+        console.log("Image URLs for petId", petId, imageUrls.length); // Detailed debug log
 
-      return {
-        ...pet,
-        pet_image: imageUrls,
-      };
-    }));
+        return {
+          ...pet,
+          pet_image: imageUrls,
+        };
+      })
+    );
 
     return petsWithImages;
   } catch (err) {
@@ -118,7 +123,7 @@ async function getPetDetails(_, { petId }) {
     const pet_detail = await db
       .collection("pets")
       .findOne({ _id: petIdObjectId });
-      console.log(pet_detail);
+    console.log(pet_detail);
 
     if (!pet_detail) {
       console.log("No pets found in the database.");
@@ -141,7 +146,57 @@ async function getPetDetails(_, { petId }) {
   }
 }
 
+//api for updating pet details
+async function updatePet(_, { id, pet }) {
+  try {
+    console.log("inside update");
+    const db = getDb();
+    const petIdObjectId = new ObjectId(id); // Convert to ObjectId
+    if (petIdObjectId) {
+      const petEdit = await db
+        .collection("pets")
+        .findOne({ _id: petIdObjectId });
+      Object.assign(petEdit, pet);
+    }
+    await db
+      .collection("pets")
+      .updateOne({ _id: petIdObjectId }, { $set: pet });
+    const editedData = await db
+      .collection("pets")
+      .findOne({ _id: petIdObjectId });
+    return editedData;
+  } catch (err) {
+    console.error("Error in updatePet():", err);
+  }
+}
+
+//delete employee record permanently from database
+async function adoptPetDelete(_, { id }) {
+  try {
+    const db = getDb();
+    const petIdObjectId = new ObjectId(id); // Convert to ObjectId
+    if (petIdObjectId) {
+      const result = await db
+        .collection("pets")
+        .removeOne({ _id: petIdObjectId });
+      if (result.deletedCount === 1) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  } catch (err) {
+    console.error("Error in adoptPetDelete():", err);
+  }
+}
+
 //export modules
 module.exports = {
-  createPet, insertImg, getAllPets, getAllPetsByUser, getPetDetails
+  createPet,
+  insertImg,
+  getAllPets,
+  getAllPetsByUser,
+  getPetDetails,
+  updatePet,
+  adoptPetDelete,
 };

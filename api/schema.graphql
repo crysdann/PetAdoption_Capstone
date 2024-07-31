@@ -83,6 +83,17 @@ input petInput {
   pet_description: String
   pet_video: String
 }
+input petUpdateInput {  
+  pet_age: Int!
+  pet_gender: String!
+  pet_breed: String!
+  vaccination_status: String!
+  location: String!
+  health_issues: String
+  pet_behaviour: String
+  pet_description: String
+  pet_video: String
+}
 
 input ImageInput {
   petId: ID!
@@ -121,4 +132,6 @@ type Mutation {
   addLostPet(input: LostPetInput!): LostPet!
   createUser(user: UserInput): User!
   loginUser(email: String!, password: String!): User!
+  updatePet(id: ID! pet: petUpdateInput!):Pet!
+  adoptPetDelete(id: ID!): Boolean!
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import graphQLFetch from "../graphQLFetch";
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+import { Link } from "react-router-dom";
 
 const UserProfile = () => {
   const [lostPets, setLostPets] = useState([]);
@@ -107,7 +108,12 @@ const UserProfile = () => {
           if (!response) {
             throw new Error("Failed to fetch details.");
           }
-          setter(response.getLostPetsByUser || response.getAllPetsByUser || response.getUserDetails || response.getSuccessStoriesByUser);
+          setter(
+            response.getLostPetsByUser ||
+              response.getAllPetsByUser ||
+              response.getUserDetails ||
+              response.getSuccessStoriesByUser
+          );
         }
       } catch (error) {
         console.error("Error fetching details:", error);
@@ -124,7 +130,7 @@ const UserProfile = () => {
     const { name, value, type, files } = e.target;
     setUserDetails((prevDetails) => ({
       ...prevDetails,
-      [name]: type === 'file' ? files[0] : value,
+      [name]: type === "file" ? files[0] : value,
     }));
   };
 
@@ -134,6 +140,36 @@ const UserProfile = () => {
 
   const refreshPage = () => {
     window.location.reload();
+  };
+
+  const handlePetDelete = async (id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this pet?"
+    );
+    if (confirmed) {
+      try {
+        // Define the GraphQL mutation query
+        const query = `mutation adoptPetDelete($id: ID!) {
+      adoptPetDelete(id: $id)
+       }`;
+
+        // Execute the GraphQL mutation to delete the pet
+        const data = await graphQLFetch(query, { id });
+        // Check if the deletion was successful
+        if (data.adoptPetDelete) {
+          alert("Pet deleted successfully");
+          // Remove the deleted pet from the state
+          setAdoptionDetails((prevDetails) =>
+            prevDetails.filter((pet) => pet._id !== id)
+          );
+        } else {
+          alert("Error deleting pet, try again");
+        }
+      } catch (error) {
+        console.error("Error deleting pet:", error);
+        alert("Failed to delete pet");
+      }
+    }
   };
 
   if (loading) return <p>Loading...</p>;
@@ -154,9 +190,11 @@ const UserProfile = () => {
               {/* About Me */}
               <div
                 id="about_me"
-                className={`text-gray-900 rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${currentStep === 1 ? "bg-primary-brown  text-white" : ""
-                  }`}
-                onClick={() => showStep(1)}>
+                className={`text-gray-900 rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${
+                  currentStep === 1 ? "bg-primary-brown  text-white" : ""
+                }`}
+                onClick={() => showStep(1)}
+              >
                 <div className="flex md:gap-2 sm:text-xl xs:text-md font-semibold dark:text-white">
                   About Me
                 </div>
@@ -165,9 +203,11 @@ const UserProfile = () => {
               {/* Adoption */}
               <div
                 id="Adoption"
-                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${currentStep === 2 ? "bg-primary-brown  text-white" : ""
-                  }`}
-                onClick={() => showStep(2)}>
+                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${
+                  currentStep === 2 ? "bg-primary-brown  text-white" : ""
+                }`}
+                onClick={() => showStep(2)}
+              >
                 <div className="flex md:gap-2 sm:text-xl xs:text-md font-semibold dark:text-white">
                   Adoption Details
                 </div>
@@ -176,9 +216,11 @@ const UserProfile = () => {
               {/* Lost Pets */}
               <div
                 id="lost_pets"
-                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${currentStep === 3 ? "bg-primary-brown  text-white" : ""
-                  }`}
-                onClick={() => showStep(3)}>
+                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${
+                  currentStep === 3 ? "bg-primary-brown  text-white" : ""
+                }`}
+                onClick={() => showStep(3)}
+              >
                 <div className="flex md:gap-2 sm:text-xl xs:text-md font-semibold dark:text-white">
                   Find your lost pets
                 </div>
@@ -186,9 +228,11 @@ const UserProfile = () => {
               {/* Success Stories */}
               <div
                 id="success_stories"
-                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${currentStep === 4 ? "bg-primary-brown  text-white" : ""
-                  }`}
-                onClick={() => showStep(4)}>
+                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${
+                  currentStep === 4 ? "bg-primary-brown  text-white" : ""
+                }`}
+                onClick={() => showStep(4)}
+              >
                 <div className="flex md:gap-2 sm:text-xl xs:text-md font-semibold dark:text-white">
                   Share your story
                 </div>
@@ -203,7 +247,10 @@ const UserProfile = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* First Name */}
                     <div className="w-full">
-                      <label htmlFor="first_name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      <label
+                        htmlFor="first_name"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
                         First Name
                       </label>
                       <input
@@ -219,7 +266,8 @@ const UserProfile = () => {
                     <div className="w-full">
                       <label
                         htmlFor="last_name"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
                         Last Name
                       </label>
                       <input
@@ -235,7 +283,8 @@ const UserProfile = () => {
                     <div className="w-full">
                       <label
                         htmlFor="profile_picture"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
                         Profile Picture
                       </label>
                       <input
@@ -250,7 +299,8 @@ const UserProfile = () => {
                     <div className="w-full">
                       <label
                         htmlFor="dob"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
                         Date of Birth
                       </label>
                       <input
@@ -265,14 +315,16 @@ const UserProfile = () => {
                     <div className="w-full">
                       <label
                         htmlFor="gender"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
                         Gender
                       </label>
                       <select
                         name="gender"
                         id="gender"
                         className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        required>
+                        required
+                      >
                         <option value="">Select Gender</option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
@@ -283,7 +335,8 @@ const UserProfile = () => {
                     <div className="w-full mb-4">
                       <label
                         htmlFor="email"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
                         Email Address
                       </label>
                       <input
@@ -299,7 +352,8 @@ const UserProfile = () => {
                     <div className="w-full mb-4">
                       <label
                         htmlFor="phone"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
                         Phone Number
                       </label>
                       <input
@@ -315,7 +369,8 @@ const UserProfile = () => {
                     <div className="w-full mb-4">
                       <label
                         htmlFor="alt_phone"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
                         Alternative Number
                       </label>
                       <input
@@ -328,11 +383,14 @@ const UserProfile = () => {
                     </div>
                     {/* Change Password */}
                     <div className="w-full mb-4 relative">
-                      <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      <label
+                        htmlFor="password"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
                         Change Password
                       </label>
                       <input
-                        type={showPassword ? 'text' : 'password'}
+                        type={showPassword ? "text" : "password"}
                         name="password"
                         id="password"
                         className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -342,7 +400,7 @@ const UserProfile = () => {
                       <div
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                        style={{ top: '1.75rem' }}
+                        style={{ top: "1.75rem" }}
                       >
                         {showPassword ? (
                           <EyeSlashIcon className="h-5 w-5 text-gray-500" />
@@ -353,20 +411,25 @@ const UserProfile = () => {
                     </div>
                     {/* Confirm Password */}
                     <div className="w-full mb-4 relative">
-                      <label htmlFor="confirm_password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      <label
+                        htmlFor="confirm_password"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
                         Confirm Password
                       </label>
                       <input
-                        type={showConfirmPassword ? 'text' : 'password'}
+                        type={showConfirmPassword ? "text" : "password"}
                         name="confirm_password"
                         id="confirm_password"
                         className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         required
                       />
                       <div
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
                         className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                        style={{ top: '1.75rem' }}
+                        style={{ top: "1.75rem" }}
                       >
                         {showPassword ? (
                           <EyeSlashIcon className="h-5 w-5 text-gray-500" />
@@ -378,13 +441,13 @@ const UserProfile = () => {
                     {/* Update  Button */}
                     <button
                       type="button"
-                      className="block rounded text-xl bg-primary-light-brown border-[#d2c8bc] py-3 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200">
+                      className="block rounded text-xl bg-primary-light-brown border-[#d2c8bc] py-3 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
+                    >
                       Update
                     </button>
                   </div>
                 </div>
               )}
-
 
               {/* Step 2: Adoption */}
               {currentStep === 2 && (
@@ -402,7 +465,7 @@ const UserProfile = () => {
                   </div>
                   <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     {adoptionDetails.length > 0 ? (
-                      adoptionDetails.map((adoption) => (
+                      adoptionDetails.map((adoption) =>
                         adoption ? (
                           <div
                             key={adoption._id}
@@ -416,18 +479,27 @@ const UserProfile = () => {
                               />
                             )}
                             <div className="p-4">
-                              <h2 className="text-xl font-semibold text-primary-dark mb-2">{adoption.pet_name}</h2>
-                              <h3 className="text-sm text-primary-dark mb-2">Age: {adoption.pet_age}</h3>
-                              <h3 className="text-sm text-primary-dark mb-2">Type: {adoption.pet_type}</h3>
-                              <h3 className="text-sm text-primary-dark mb-2">Pet Behaviour: {adoption.pet_behaviour}</h3>
+                              <h2 className="text-xl font-semibold text-primary-dark mb-2">
+                                {adoption.pet_name}
+                              </h2>
+                              <h3 className="text-sm text-primary-dark mb-2">
+                                Age: {adoption.pet_age}
+                              </h3>
+                              <h3 className="text-sm text-primary-dark mb-2">
+                                Type: {adoption.pet_type}
+                              </h3>
+                              <h3 className="text-sm text-primary-dark mb-2">
+                                Pet Behaviour: {adoption.pet_behaviour}
+                              </h3>
                               <div className="flex justify-start mt-4 space-x-2">
-                                <a
-                                  href="adoptdataform"
+                                <Link
+                                  to={`/edit-pet/${adoption._id}`}
                                   className="inline-block rounded text-sm bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
                                 >
                                   Edit
-                                </a>
+                                </Link>
                                 <button
+                                  onClick={() => handlePetDelete(adoption._id)}
                                   className="inline-block rounded text-sm bg-red-500 border-red-600 py-2 px-4 font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring transition duration-200"
                                 >
                                   Delete
@@ -436,11 +508,15 @@ const UserProfile = () => {
                             </div>
                           </div>
                         ) : (
-                          <p className="text-primary-dark">Some adoption details are missing or incorrect.</p>
+                          <p className="text-primary-dark">
+                            Some adoption details are missing or incorrect.
+                          </p>
                         )
-                      ))
+                      )
                     ) : (
-                      <p className="text-primary-dark">No adoption details posted yet.</p>
+                      <p className="text-primary-dark">
+                        No adoption details posted yet.
+                      </p>
                     )}
                   </div>
                 </div>
@@ -467,7 +543,6 @@ const UserProfile = () => {
                           key={pet._id}
                           className="bg-primary-white rounded-lg shadow-md overflow-hidden transform transition duration-500 hover:shadow-lg hover:-translate-y-2"
                         >
-
                           {pet.pet_image && (
                             <img
                               src={pet.pet_image}
@@ -476,10 +551,21 @@ const UserProfile = () => {
                             />
                           )}
                           <div className="p-4">
-                            <h2 className="text-xl font-semibold text-primary-dark mb-2">{pet.pet_name}</h2>
-                            <h3 className="text-sm text-primary-dark mb-2">Type: {pet.pet_type}</h3>
-                            <h3 className="text-sm text-primary-dark mb-2">Last Seen Location: {pet.last_seen_location}</h3>
-                            <h3 className="text-sm text-primary-dark mb-2">Last Seen Date: {new Date(pet.last_seen_date).toLocaleDateString()}</h3  >
+                            <h2 className="text-xl font-semibold text-primary-dark mb-2">
+                              {pet.pet_name}
+                            </h2>
+                            <h3 className="text-sm text-primary-dark mb-2">
+                              Type: {pet.pet_type}
+                            </h3>
+                            <h3 className="text-sm text-primary-dark mb-2">
+                              Last Seen Location: {pet.last_seen_location}
+                            </h3>
+                            <h3 className="text-sm text-primary-dark mb-2">
+                              Last Seen Date:{" "}
+                              {new Date(
+                                pet.last_seen_date
+                              ).toLocaleDateString()}
+                            </h3>
                             <div className="flex justify-start mt-4 space-x-4">
                               <a
                                 href="LostPetForm"
@@ -487,9 +573,7 @@ const UserProfile = () => {
                               >
                                 Edit
                               </a>
-                              <button
-                                className="inline-block rounded text-sm bg-red-500 border-red-600 py-2 px-4 font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring transition duration-200"
-                              >
+                              <button className="inline-block rounded text-sm bg-red-500 border-red-600 py-2 px-4 font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring transition duration-200">
                                 Delete
                               </button>
                             </div>
@@ -519,10 +603,21 @@ const UserProfile = () => {
                   {successStories.length > 0 ? (
                     <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                       {successStories.map((story) => (
-                        <div key={story._id} className="border p-4 rounded-lg shadow-lg">
-                          <img src={story.petPhotoUrl} alt={story.petName} className="w-full h-64 object-cover mb-2 rounded-lg" />
-                          <h2 className="text-xl font-semibold mb-2">{story.petName}</h2>
-                          <p><strong>Description:</strong> {story.description}</p>
+                        <div
+                          key={story._id}
+                          className="border p-4 rounded-lg shadow-lg"
+                        >
+                          <img
+                            src={story.petPhotoUrl}
+                            alt={story.petName}
+                            className="w-full h-64 object-cover mb-2 rounded-lg"
+                          />
+                          <h2 className="text-xl font-semibold mb-2">
+                            {story.petName}
+                          </h2>
+                          <p>
+                            <strong>Description:</strong> {story.description}
+                          </p>
                           <div className="flex justify-start mt-4 space-x-4">
                             <a
                               href="successstoryform"
@@ -530,9 +625,7 @@ const UserProfile = () => {
                             >
                               Edit
                             </a>
-                            <button
-                              className="inline-block rounded text-sm bg-red-500 border-red-600 py-2 px-4 font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring transition duration-200"
-                            >
+                            <button className="inline-block rounded text-sm bg-red-500 border-red-600 py-2 px-4 font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring transition duration-200">
                               Delete
                             </button>
                           </div>
@@ -540,7 +633,9 @@ const UserProfile = () => {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500">No success stories available.</p>
+                    <p className="text-gray-500">
+                      No success stories available.
+                    </p>
                   )}
                 </div>
               )}
@@ -548,7 +643,7 @@ const UserProfile = () => {
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 
