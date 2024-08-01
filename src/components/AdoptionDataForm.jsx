@@ -143,11 +143,14 @@ const AdoptForm = () => {
       <h1 className="flex justify-center pt-4 pb-2 text-[2rem] sm:text-[3rem] font-bold text-[#644b3c] ">
         Register pets for adoption
       </h1>
+      <div className="max-w-3xl mx-auto">
       <p className="text-lg text-primary-dark mb-2">
         Let's get started on finding a new home for your pet! Complete the form
         below with all necessary details that help to understand your pet better
         and find the right family for them.
       </p>
+      </div>
+      
       <br></br>
       <form
         className="max-w-3xl mx-auto bg-white shadow-md rounded px-8 pt-8 pb-8"

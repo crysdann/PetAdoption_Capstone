@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import graphQLFetch from "../graphQLFetch";
@@ -9,7 +9,6 @@ import calendarImg from "../assets/images/calendar.png";
 import pawImg from "../assets/images/pawprint.png";
 import locationImg from "../assets/images/location.png";
 import vaccinationImg from "../assets/images/vaccine.png";
-
 
 const PetCarousel = ({ pet_images }) => {
   // Ensure there are at least 3 images
@@ -145,6 +144,175 @@ const PetInfo = ({ pet }) => {
   );
 };
 
+const ContactOwnerForm = ({ petDetails, userId }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    message: '',
+  });
+
+  const [emailSent, setEmailSent] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      // Fetch user email
+      const query = `
+        query getUserDetails($userId: ID!) {
+          getUserDetails(_id: $userId) {
+            email
+          }
+        }
+      `;
+      const variables = { userId };
+      const data = await graphQLFetch(query, variables);
+      const userEmail = data.getUserDetails.email;
+
+      const htmlContent = `
+  <html>
+  <body>
+    <p>Hello,</p>
+
+    <p>Here's the information about the pet:</p>
+
+    <ul>
+      <li><strong>Name:</strong> ${petDetails.pet_name}</li>
+      <li><strong>Age:</strong> ${petDetails.pet_age}</li>
+      <li><strong>Type:</strong> ${petDetails.pet_type}</li>
+      <li><strong>Description:</strong> ${petDetails.pet_description}</li>
+      <li><strong>Health Issues:</strong> ${petDetails.health_issues}</li>
+      <li><strong>Behaviour:</strong> ${petDetails.pet_behaviour}</li>
+      <li><strong>Location:</strong> ${petDetails.location}</li>
+    </ul>
+
+    <p><strong>Message:</strong></p>
+    <p>${formData.message}</p>
+
+    <p><strong>Contact details of person interested in your pet:</strong></p>
+    <ul>
+      <li><strong>Name:</strong> ${formData.name}</li>
+      <li><strong>Phone:</strong> ${formData.phone}</li>
+      <li><strong>Email:</strong> ${formData.email}</li>
+    </ul>
+
+    <p>Regards,<br>Pet Connect</p>
+  </body>
+  </html>
+`;
+
+const response = await fetch('http://localhost:4000/api/send-email', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    to: userEmail,
+    subject: `Details about ${petDetails.pet_name}`,
+    html: htmlContent,
+  }),
+});
+
+if (response.ok) {
+  alert('Email sent successfully');
+} else {
+  alert('Error sending email');
+}
+
+
+
+      
+    } catch (error) {
+      console.error('Error sending email:', error);
+    }
+  };
+
+  return (
+    <div className="p-6 mx-auto bg-primary-light-brown rounded-lg shadow-md">
+      <h2 className="text-xl font-semibold mb-4">Contact the Pet Owner</h2>
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-opacity-50"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone</label>
+            <input
+              type="text"
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-opacity-50"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-opacity-50"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="message" className="block text-sm font-medium text-gray-700">Message</label>
+            <textarea
+              id="message"
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
+              rows="6"
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-opacity-50"
+            ></textarea>
+          </div>
+
+          <button
+            type="submit"
+            className="inline-block shrink-0 rounded-md border bg-primary-brown px-12 py-3 text-sm font-medium text-white transition focus:outline-none focus:ring active:text-blue-500"
+          >
+            Send Email
+          </button>
+          
+          {emailSent && (
+            <div className="text-green-600">
+              Email has been sent successfully.
+            </div>
+          )}
+        </div>
+      </form>
+    </div>
+  );
+};
+
 const PetDetails = () => {
   const [pet, setPet] = useState(null);
   const [pet_images, setImages] = useState([]);
@@ -195,10 +363,15 @@ const PetDetails = () => {
   }, [petId]);
 
   return (
+    <Fragment>
     <div className="pt-[12rem] pb-[2rem] mx-9 sm:mx-15 flex flex-col items-center">
       <PetCarousel pet_images={pet_images} />
-      {pet && <PetInfo pet={pet} />}
+      {pet && <PetInfo pet={pet} />}      
     </div>
+    <div className=" pb-[2rem] mx-14 sm:mx-15">
+    {pet && <ContactOwnerForm petDetails={pet} userId={pet.user_id} />}
+    </div>
+    </Fragment>
   );
 };
 
