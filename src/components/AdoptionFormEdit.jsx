@@ -185,9 +185,11 @@ const AdoptFormEdit = () => {
       <h1 className="flex justify-center pt-4 pb-2 text-[2rem] sm:text-[3rem] font-bold text-[#644b3c] ">
         Edit Pet Details
       </h1>
+      <div className="max-w-3xl mx-auto">
       <p className="text-lg text-primary-dark mb-2">
             Here you can manage your pet details. Please make sure to review the information before making any updates.
           </p>
+          </div>
           <br></br>
       <form
         className="max-w-3xl mx-auto bg-white shadow-md rounded px-8 pt-8 pb-8"
