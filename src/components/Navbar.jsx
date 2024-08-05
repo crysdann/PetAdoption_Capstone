@@ -10,6 +10,7 @@ const Navbar = () => {
   const [profileDropdown, setProfileDropdown] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   const handleNav = () => {
@@ -21,10 +22,10 @@ const Navbar = () => {
   };
 
   const handleProfileClick = () => {
-    if (userType === 'admin') {
-      navigate('/adminprofile'); // Ensure this route is properly set up
+    if (userType === "admin") {
+      navigate("/adminprofile");
     } else {
-      navigate('/UserProfile'); // Ensure this route is properly set up
+      navigate("/UserProfile");
     }
     setProfileDropdown(false);
   };
@@ -35,6 +36,11 @@ const Navbar = () => {
     setIsLoggedIn(false);
     setUserType("");
     setProfileDropdown(false);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    navigate(`/search?query=${searchQuery}`);
   };
 
   useEffect(() => {
@@ -138,32 +144,31 @@ const Navbar = () => {
 
       {/* Search Bar and User Icon */}
       <div className="w-full min-h-[50px] flex justify-between items-center absolute top-[6rem] bg-primary-light-brown px-4">
-        <form action="" className="relative pt-[5px] pb-[5px] w-[20rem]">
-          <div className="relative w-full flex items-center text-gray-400 focus-within:text-gray-600">
-            <IoSearch className="w-5 h-5 absolute ml-3 pointer-events-none" />
-            <input
-              type="text"
-              name="search"
-              placeholder="Search here"
-              autoComplete="off"
-              aria-label="search here"
-              className="pr-3 pl-10 py-2 w-full font-semibold rounded-3xl border-none ring-1 ring-gray-300 focus:ring-gray-600 focus:ring-1 outline-none"
-            />
-          </div>
+        <form onSubmit={handleSearchSubmit} className="flex items-center">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search..."
+            className="border-b border-primary-brown outline-none"
+          />
+          <button type="submit" className="text-primary-brown ml-2">
+            <IoSearch size={20} />
+          </button>
         </form>
         {isLoggedIn && (
-        <div
-          className="text-2xl hover:text-primary-brown hover:bg-primary-white transition duration-300 cursor-pointer ml-4 mr-4 border rounded-3xl border-gray w-[3rem] h-[3rem] flex justify-center items-center user-profile-icon"
-          onClick={handleProfileDropdown}>
-          <FaRegUser />
-        </div>)}
+          <div
+            className="text-2xl hover:text-primary-brown hover:bg-primary-white transition duration-300 cursor-pointer ml-4 mr-4 border rounded-3xl border-gray w-[3rem] h-[3rem] flex justify-center items-center user-profile-icon"
+            onClick={handleProfileDropdown}>
+            <FaRegUser />
+          </div>
+        )}
         {profileDropdown && isLoggedIn && (
           <div className="flex flex-col z-10 absolute top-[5rem] right-[1rem] w-[120px] rounded-2xl border-[1px] userprofiledropdown bg-primary-light-brown opacity-85">
             <ul className="flex flex-col text-[17px]">
               <li
                 className="p-[10px] border-b border-white hover:text-primary-white cursor-pointer"
-                onClick={handleProfileClick}
-              >
+                onClick={handleProfileClick}>
                 Profile
               </li>
               <li className="p-[10px] border-b border-white hover:text-primary-white cursor-pointer">
@@ -171,8 +176,7 @@ const Navbar = () => {
               </li>
               <li
                 className="p-[10px] hover:text-primary-white cursor-pointer"
-                onClick={handleLogout}
-              >
+                onClick={handleLogout}>
                 Logout
               </li>
             </ul>

@@ -83,7 +83,7 @@ input petInput {
   pet_description: String
   pet_video: String
 }
-input petUpdateInput {  
+input petUpdateInput {
   pet_age: Int!
   pet_gender: String!
   pet_breed: String!
@@ -122,6 +122,8 @@ type Query {
   getLostPetsByUser(user_id: ID!): [LostPet]
   getUserDetails(_id: ID!): User
   getPetDetails(petId: ID!): Pet!
+  searchSuccessStories(searchQuery: String!): [SuccessStory]
+  searchAdoptPets(searchQuery: String!): [Pet]
 }
 
 type Mutation {
@@ -132,6 +134,6 @@ type Mutation {
   addLostPet(input: LostPetInput!): LostPet!
   createUser(user: UserInput): User!
   loginUser(email: String!, password: String!): User!
-  updatePet(id: ID! pet: petUpdateInput!):Pet!
+  updatePet(id: ID!, pet: petUpdateInput!): Pet!
   adoptPetDelete(id: ID!): Boolean!
 }
