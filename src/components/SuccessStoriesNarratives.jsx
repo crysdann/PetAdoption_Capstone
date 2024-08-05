@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import graphQLFetch from "../graphQLFetch";
-import ss1 from "../assets/images/ss1.jpg";
-import ss2 from "../assets/images/ss2.jpg";
-import ss3 from "../assets/images/ss3.jpg";
+import { Link } from "react-router-dom";
 
 const SuccessStoriesNarratives = () => {
   const { id } = useParams();
   const [story, setStory] = useState(null);
+  const [relatedStories, setRelatedStories] = useState([]);
 
   useEffect(() => {
     const fetchSuccessStories = async () => {
@@ -44,6 +43,9 @@ const SuccessStoriesNarratives = () => {
       const storyData = stories.find((story) => story.id === id);
       console.log("Found story:", storyData);
       setStory(storyData);
+
+      const shuffledStories = stories.sort(() => 0.5 - Math.random());
+      setRelatedStories(shuffledStories.slice(0, 3));
     };
     getStoryById();
   }, [id]);
@@ -68,33 +70,27 @@ const SuccessStoriesNarratives = () => {
           {story.description}
         </h3>
       </div>
-      <div className="flex bg-primary-white  flex-col justify-center items-center p-[4rem]">
+      <div className="flex bg-primary-white flex-col justify-center items-center p-[4rem]">
         <h2 className="text-[#5c4e51]">Related stories</h2>
         <div className="flex flex-col gap-6 mt-[3rem] sm:flex-row">
-          <div className="shadow-lg transition transition-transform duration-300 hover:scale-105">
-            <div className="bg-white flex flex-col justify-center items-center">
-              <img src={ss1} alt="relatedarticle1" />
-              <p className="p-6 font-dancing-script text-[#5c4e51] text-4xl">
-                Cheddar
-              </p>
-            </div>
-          </div>
-          <div className="shadow-lg transition transition-transform duration-300 hover:scale-105">
-            <div className="bg-white flex flex-col justify-center items-center">
-              <img src={ss2} alt="relatedarticle2" />
-              <p className="p-6 font-dancing-script text-[#5c4e51] text-4xl">
-                Whiskers
-              </p>
-            </div>
-          </div>
-          <div className="shadow-lg transition transition-transform duration-300 hover:scale-105">
-            <div className="bg-white flex flex-col justify-center items-center">
-              <img src={ss3} alt="relatedarticle3" />
-              <p className="p-6 font-dancing-script text-[#5c4e51] text-4xl">
-                Buttercup
-              </p>
-            </div>
-          </div>
+          {relatedStories.map((relatedStory, index) => (
+            <Link
+              key={index}
+              to={`/SuccessStoriesNarratives/${relatedStory.id}`}>
+              <div className="shadow-lg transition transition-transform duration-300 hover:scale-105">
+                <div className="bg-white flex flex-col justify-center items-center">
+                  <img
+                    className="related-stories-img"
+                    src={relatedStory.petPhotoUrl}
+                    alt={`relatedarticle${index}`}
+                  />
+                  <p className="p-6 font-dancing-script text-[#5c4e51] text-4xl">
+                    {relatedStory.petName}
+                  </p>
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </div>

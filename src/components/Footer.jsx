@@ -19,7 +19,7 @@ const Footer = () => {
     <div>
       <div className="w-full min-h-[150px] bg-primary-dark text-white  sm:flex-row justify-center items-center">
         <h1 className="text-xl sm:text-2xl md:text-4xl flex justify-center items-center p-8">
-          Contact Us
+          Helpline
         </h1>
         <div className="w-full min-h-[150px] bg-primary-dark text-white flex flex-row sm:flex-col justify-center items-center text-1xl">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full max-w-4xl">
@@ -31,12 +31,14 @@ const Footer = () => {
                 </h2>
               </div>
               <div className="flex items-center">
-                <LuPhone className="mr-2 w-4 h-4" />
+                <LuPhone className="mr-2 w-6 h-6" />
                 <h2 className="text-[15px] sm:text-xl">+1 999-999-9999</h2>
               </div>
               <div className="flex items-center">
-                <MdOutlineMail className="mr-2" />
-                <h2 className="text-[15px] sm:text-xl">petconnect@gmail.com</h2>
+                <MdOutlineMail className="mr-2 w-6 h-6" />
+                <h2 className="text-[15px] sm:text-xl">
+                  petconnectcs@gmail.com
+                </h2>
               </div>
             </div>
             <div className="flex flex-row space-y-4 pb-16 text-dark text-center justify-center md:flex-col">
