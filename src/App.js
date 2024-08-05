@@ -17,6 +17,7 @@ import AdoptForm from "./components/AdoptionDataForm";
 import SuccessStoriesForm from "./components/SuccessStoriesForm";
 import Adminprofile from "./components/Adminprofile";
 import AdoptFormEdit from "./components/AdoptionFormEdit";
+import SearchResults from "./components/SearchResults";
 
 function App() {
   const location = useLocation();
@@ -45,6 +46,7 @@ function App() {
         <Route path="successstoriesform" element={<SuccessStoriesForm />} />
         <Route path="adminprofile" element={<Adminprofile />} />
         <Route path="/edit-pet/:petId" element={<AdoptFormEdit />} />
+        <Route path="/search" element={<SearchResults />} />{" "}
       </Routes>
       {!isLoginPage && <Footer />}
     </>
