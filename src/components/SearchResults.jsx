@@ -21,15 +21,31 @@ const SearchResults = () => {
             description
             petPhotoUrl
           }
+            searchAdoptPets(searchQuery: $searchQuery) {
+            pet_name
+            pet_image
+            pet_type
+            pet_age
+            pet_gender
+            pet_breed
+          }
         }
       `;
 
+      console.log("GraphQL Query:", searchQueryText);
+      console.log(`Search query: ${searchQuery}`);
       const variables = { searchQuery };
 
       try {
         const result = await graphQLFetch(searchQueryText, variables);
-        if (result && result.searchSuccessStories) {
-          setResults(result.searchSuccessStories);
+        console.log("GraphQL result:", result);
+
+        if (result) {
+          const combinedResults = [
+            ...(result.searchSuccessStories || []),
+            ...(result.searchAdoptPets || []),
+          ];
+          setResults(combinedResults);
         } else {
           setResults([]);
         }
@@ -43,14 +59,17 @@ const SearchResults = () => {
       fetchSearchResults();
     }
   }, [searchQuery]);
+  console.log("Results passed to Items:", results);
 
   return (
     <div>
       <h1>Search Results for "{searchQuery}"</h1>
       <div className="results-grid">
-        {results.map((item) => (
+        {results.length > 0 ? (
           <Items currentItems={results} />
-        ))}
+        ) : (
+          <p>No results found.</p>
+        )}
       </div>
     </div>
   );

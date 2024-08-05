@@ -123,6 +123,7 @@ type Query {
   getUserDetails(_id: ID!): User
   getPetDetails(petId: ID!): Pet!
   searchSuccessStories(searchQuery: String!): [SuccessStory]
+  searchAdoptPets(searchQuery: String!): [Pet]
 }
 
 type Mutation {

@@ -3,15 +3,19 @@ import PropTypes from "prop-types";
 import ItemCard from "./ItemCard";
 
 const Items = ({ currentItems }) => {
+  console.log(`currentItems: ${currentItems}`);
   if (currentItems.length === 0) {
     return <p>No results found.</p>;
   }
 
+  const filteredItems = currentItems.filter((item) => item !== null);
+  console.log(`Filtered items: ${JSON.stringify(filteredItems)}`);
+
   return (
     <div className="items-grid">
-      {currentItems.map((item) => (
-        <ItemCard key={item.id} item={item} />
-      ))}
+      {currentItems.map((item, index) =>
+        item ? <ItemCard key={item._id || index} item={item} /> : null
+      )}
     </div>
   );
 };
@@ -19,10 +23,14 @@ const Items = ({ currentItems }) => {
 Items.propTypes = {
   currentItems: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      petName: PropTypes.string.isRequired,
-      description: PropTypes.string.isRequired,
-      petPhotoUrl: PropTypes.string.isRequired,
+      id: PropTypes.string,
+      _id: PropTypes.string,
+      petName: PropTypes.string,
+      pet_name: PropTypes.string,
+      description: PropTypes.string,
+      pet_description: PropTypes.string,
+      petPhotoUrl: PropTypes.string,
+      pet_image: PropTypes.string,
     })
   ).isRequired,
 };

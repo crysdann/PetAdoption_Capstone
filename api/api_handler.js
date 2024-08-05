@@ -21,6 +21,7 @@ const {
   getSuccessStories,
   getSuccessStoriesByUser,
   searchSuccessStories,
+  searchAdoptPets,
 } = require("./successstories.js");
 require("dotenv").config();
 
@@ -35,6 +36,9 @@ const resolvers = {
     getUserDetails: getUserDetails,
     getPetDetails: getPetDetails,
     searchSuccessStories,
+    searchAdoptPets: async (_, { searchQuery }) => {
+      return searchAdoptPets(_, { searchQuery });
+    },
   },
   Mutation: {
     createPet: createPet,
