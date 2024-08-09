@@ -14,14 +14,21 @@ const {
   insertPetImg,
   getLostPets,
   getLostPetsByUser,
+  deleteLostPet,
 } = require("./lostpets.js");
-const { createUser, loginUser, getUserDetails } = require("./users.js");
+const {
+  createUser,
+  loginUser,
+  getUserDetails,
+  updateUserDetails,
+} = require("./users.js");
 const {
   createSuccessStory,
   getSuccessStories,
   getSuccessStoriesByUser,
   searchSuccessStories,
   searchAdoptPets,
+  deleteSuccessStory,
 } = require("./successstories.js");
 require("dotenv").config();
 
@@ -50,6 +57,9 @@ const resolvers = {
     loginUser: loginUser,
     updatePet: updatePet,
     adoptPetDelete: adoptPetDelete,
+    updateUserDetails: updateUserDetails,
+    deleteSuccessStory: deleteSuccessStory,
+    deleteLostPet: deleteLostPet,
   },
 };
 

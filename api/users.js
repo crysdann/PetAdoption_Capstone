@@ -59,7 +59,32 @@ async function getUserDetails(_, { _id }) {
   }
 }
 
+// New function for updating user details
+async function updateUserDetails(_, { _id, first_name, last_name, email, phone, password }) {
+  try {
+    const db = getDb();
+    const userId = new ObjectId(_id);
+
+    // Update user details in the database
+    const result = await db.collection('users').findOneAndUpdate(
+      { _id: userId },
+      { $set: { first_name, last_name, email, phone, password } },
+      { returnDocument: 'after' }
+    );
+
+    if (!result.value) {
+      throw new Error('User not found.');
+    }
+
+    console.log('User details updated successfully:', result.value);
+    return result.value;
+  } catch (err) {
+    console.error('Error updating user details:', err);
+    throw err;
+  }
+}
+
 //export modules
 module.exports = {
-  createUser, loginUser, getUserDetails
+  createUser, loginUser, getUserDetails, updateUserDetails,
 };

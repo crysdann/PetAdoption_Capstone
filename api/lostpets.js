@@ -107,10 +107,31 @@ const getLostPetsByUser = async (_, { user_id }) => {
     }
 };
 
+// Function to delete a lost pet record by ID
+async function deleteLostPet(_, { id }) {
+    try {
+        const db = getDb();
+        // Delete pet data from the lostPets collection
+        const result = await db.collection("lostPets").deleteOne({ _id: new require('mongodb').ObjectId(id) });
+
+        if (result.deletedCount === 0) {
+            console.log("No lostPet found with the given ID.");
+            return false;
+        }
+
+        console.log("Lost pet deleted successfully:", id);
+        return true;
+    } catch (err) {
+        console.error("Error deleting lost pet:", err);
+        throw err;
+    }
+}
+
 // Export modules
 module.exports = {
     addLostPet,
     insertPetImg,
     getLostPets,
-    getLostPetsByUser
+    getLostPetsByUser,
+    deleteLostPet
 };

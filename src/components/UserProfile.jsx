@@ -110,9 +110,9 @@ const UserProfile = () => {
           }
           setter(
             response.getLostPetsByUser ||
-              response.getAllPetsByUser ||
-              response.getUserDetails ||
-              response.getSuccessStoriesByUser
+            response.getAllPetsByUser ||
+            response.getUserDetails ||
+            response.getSuccessStoriesByUser
           );
         }
       } catch (error) {
@@ -133,15 +133,43 @@ const UserProfile = () => {
       [name]: type === "file" ? files[0] : value,
     }));
   };
+  // Update functionality for User information
+  const handleUpdate = async () => {
+    try {
+      const { _id, first_name, last_name, email, phone, password } = userDetails;
+      const mutation = `
+        mutation UpdateUserDetails($_id: ID!, $first_name: String!, $last_name: String!, $email: String!, $phone: String!, $password: String!) {
+          updateUserDetails(_id: $_id, first_name: $first_name, last_name: $last_name, email: $email, phone: $phone, password: $password) {
+            _id
+            first_name
+            last_name
+            email
+            phone
+            password
+          }
+        }
+      `;
 
-  const handleUpdate = () => {
-    // Handle update logic here
+      const variables = { _id, first_name, last_name, email, phone, password };
+      const response = await graphQLFetch(mutation, variables);
+
+      if (response && response.updateUserDetails) {
+        alert("Profile updated successfully!");
+        setUserDetails(response.updateUserDetails);
+      } else {
+        alert("Failed to update profile.");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("An error occurred while updating the profile.");
+    }
   };
+
 
   const refreshPage = () => {
     window.location.reload();
   };
-
+  // delete feature for adopt
   const handlePetDelete = async (id) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this pet?"
@@ -171,6 +199,60 @@ const UserProfile = () => {
       }
     }
   };
+  // delete feature for success stories
+  const handleSuccessStoryDelete = async (id) => {
+    const confirmed = window.confirm("Are you sure you want to delete this success story?");
+    if (confirmed) {
+      try {
+        const query = `mutation deleteSuccessStory($id: ID!) {
+          deleteSuccessStory(id: $id)
+        }`;
+
+        const data = await graphQLFetch(query, { id });
+        if (data.deleteSuccessStory) {
+          alert("Success story deleted successfully");
+          setSuccessStories((prevStories) =>
+            prevStories.filter((story) => story.id !== id)
+          );
+        } else {
+          alert("Error deleting success story, try again");
+        }
+      } catch (error) {
+        console.error("Error deleting success story:", error);
+        alert("Failed to delete success story");
+      }
+    }
+  };
+  // delete feature for lost pets
+  const handleLostPetDelete = async (id) => {
+    const confirmed = window.confirm("Are you sure you want to delete this lost pet?");
+    if (confirmed) {
+      try {
+        const query = `
+          mutation deleteLostPet($id: ID!) {
+            deleteLostPet(id: $id)
+          }
+        `;
+        const variables = { id };
+
+        const response = await graphQLFetch(query, variables);
+
+        // Check if response is correctly formatted
+        if (response && response.deleteLostPet) {
+          alert("Lost pet deleted successfully");
+          setLostPets((prevPets) =>
+            prevPets.filter((pet) => pet._id !== id)
+          );
+        } else {
+          alert("Error deleting lost pet, try again");
+        }
+      } catch (error) {
+        console.error("Error deleting lost pet:", error);
+        alert("Failed to delete lost pet");
+      }
+    }
+  };
+
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -190,9 +272,8 @@ const UserProfile = () => {
               {/* About Me */}
               <div
                 id="about_me"
-                className={`text-gray-900 rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${
-                  currentStep === 1 ? "bg-primary-brown  text-white" : ""
-                }`}
+                className={`text-gray-900 rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${currentStep === 1 ? "bg-primary-brown  text-white" : ""
+                  }`}
                 onClick={() => showStep(1)}
               >
                 <div className="flex md:gap-2 sm:text-xl xs:text-md font-semibold dark:text-white">
@@ -203,9 +284,8 @@ const UserProfile = () => {
               {/* Adoption */}
               <div
                 id="Adoption"
-                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${
-                  currentStep === 2 ? "bg-primary-brown  text-white" : ""
-                }`}
+                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${currentStep === 2 ? "bg-primary-brown  text-white" : ""
+                  }`}
                 onClick={() => showStep(2)}
               >
                 <div className="flex md:gap-2 sm:text-xl xs:text-md font-semibold dark:text-white">
@@ -216,9 +296,8 @@ const UserProfile = () => {
               {/* Lost Pets */}
               <div
                 id="lost_pets"
-                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${
-                  currentStep === 3 ? "bg-primary-brown  text-white" : ""
-                }`}
+                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${currentStep === 3 ? "bg-primary-brown  text-white" : ""
+                  }`}
                 onClick={() => showStep(3)}
               >
                 <div className="flex md:gap-2 sm:text-xl xs:text-md font-semibold dark:text-white">
@@ -228,9 +307,8 @@ const UserProfile = () => {
               {/* Success Stories */}
               <div
                 id="success_stories"
-                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${
-                  currentStep === 4 ? "bg-primary-brown  text-white" : ""
-                }`}
+                className={`rounded-sm py-2 border-b-2 border-gray-200 dark:border-gray-600 pl-4 hover:bg-gray-400 hover:text-white hover:dark:bg-gray-500 cursor-pointer ${currentStep === 4 ? "bg-primary-brown  text-white" : ""
+                  }`}
                 onClick={() => showStep(4)}
               >
                 <div className="flex md:gap-2 sm:text-xl xs:text-md font-semibold dark:text-white">
@@ -295,42 +373,7 @@ const UserProfile = () => {
                         required
                       />
                     </div>
-                    {/* Date of Birth */}
-                    <div className="w-full">
-                      <label
-                        htmlFor="dob"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Date of Birth
-                      </label>
-                      <input
-                        type="date"
-                        name="dob"
-                        id="dob"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        required
-                      />
-                    </div>
-                    {/* Gender */}
-                    <div className="w-full">
-                      <label
-                        htmlFor="gender"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Gender
-                      </label>
-                      <select
-                        name="gender"
-                        id="gender"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        required
-                      >
-                        <option value="">Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
+
                     {/* Email Address */}
                     <div className="w-full mb-4">
                       <label
@@ -440,10 +483,17 @@ const UserProfile = () => {
                     </div>
                     {/* Update  Button */}
                     <button
-                      type="button"
-                      className="block rounded text-xl bg-primary-light-brown border-[#d2c8bc] py-3 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
+                      onClick={handleUpdate}
+                      className="bg-primary-brown text-white font-semibold py-2 px-4 rounded-sm shadow-md hover:bg-primary-light-brown focus:outline-none"
                     >
-                      Update
+                      Save Changes
+                    </button>
+
+                    <button
+                      onClick={refreshPage}
+                      className="bg-gray-400 text-white font-semibold py-2 px-4 rounded-sm shadow-md hover:bg-gray-500 focus:outline-none"
+                    >
+                      Cancel
                     </button>
                   </div>
                 </div>
@@ -573,7 +623,11 @@ const UserProfile = () => {
                               >
                                 Edit
                               </a>
-                              <button className="inline-block rounded text-sm bg-red-500 border-red-600 py-2 px-4 font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring transition duration-200">
+                              <button
+                                type="button"
+                                onClick={() => handleLostPetDelete(pet._id)}
+                                className="inline-block rounded text-sm bg-red-500 border-red-600 py-2 px-4 font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring transition duration-200"
+                              >
                                 Delete
                               </button>
                             </div>
@@ -625,7 +679,11 @@ const UserProfile = () => {
                             >
                               Edit
                             </a>
-                            <button className="inline-block rounded text-sm bg-red-500 border-red-600 py-2 px-4 font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring transition duration-200">
+                            <button
+                              type="button"
+                              onClick={() => handleSuccessStoryDelete(story.id)}
+                              className="inline-block rounded text-sm bg-red-500 border-red-600 py-2 px-4 font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring transition duration-200"
+                            >
                               Delete
                             </button>
                           </div>

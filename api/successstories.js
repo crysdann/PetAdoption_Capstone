@@ -176,6 +176,26 @@ const searchAdoptPets = async (_, { searchQuery }) => {
   }
 };
 
+async function deleteSuccessStory(_, { id }) {
+  try {
+    const db = getDb();
+    const result = await db.collection("successStories").deleteOne({
+      _id: ObjectId(id),
+    });
+
+    console.log("Delete result:", result);
+
+    if (result.deletedCount === 1) {
+      return true;
+    } else {
+      console.log("No success story found with the provided ID.");
+      return false;
+    }
+  } catch (err) {
+    console.error("Error deleting success story:", err);
+    throw err;
+  }
+};
 // Export modules
 module.exports = {
   createSuccessStory,
@@ -183,4 +203,5 @@ module.exports = {
   getSuccessStoriesByUser,
   searchSuccessStories,
   searchAdoptPets,
+  deleteSuccessStory,
 };
