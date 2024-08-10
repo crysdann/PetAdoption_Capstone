@@ -74,7 +74,7 @@ const getAllPets = async () => {
   }
 };
 
-// Function to get lost pets by user ID
+// Function to get adopted pets by user ID
 const getAllPetsByUser = async (_, { user_id }) => {
   try {
     const db = getDb();

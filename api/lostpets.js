@@ -1,4 +1,5 @@
 const { getDb } = require("./db");
+const { ObjectId } = require("mongodb");
 
 // Function to add a new lost pet record
 async function addLostPet(_, { input }) {
@@ -107,12 +108,64 @@ const getLostPetsByUser = async (_, { user_id }) => {
     }
 };
 
+// Function to get details of a lost pet using ID
+const getLostPetDetails = async (_, { petId }) => {
+    try {
+        const db = getDb();
+        console.log(petId);
+
+        const petIdObjectId = new ObjectId(petId); // Convert to ObjectId if needed
+        const lostpetDetail = await db.collection("lostPets").findOne({ _id: petIdObjectId });
+        console.log(lostpetDetail);
+
+        if (!lostpetDetail) {
+            console.log("No lost pet found with the given ID.");
+            return null;
+        }
+
+        // Fetch images associated with the petId
+        const images = await db.collection("images").find({ petId }).toArray();
+
+        const imageUrls = images.map(image => image.url);
+
+        const petWithImages = {
+            ...lostpetDetail,
+            pet_image: imageUrls,
+        };
+
+        return petWithImages;
+    } catch (err) {
+        console.error("Error in getLostPetDetails():", err);
+        throw err;
+    }
+};
+
+// Function to update lost pet details
+const updateLostPet = async (_, { id, input }) => {
+    try {
+        console.log("inside update");
+        const db = getDb();
+        const petIdObjectId = new ObjectId(id); // Convert to ObjectId
+
+        if (petIdObjectId) {
+            // Update the lost pet record
+            await db.collection("lostPets").updateOne({ _id: petIdObjectId }, { $set: input });
+            // Fetch the updated pet details
+            const updatedPet = await db.collection("lostPets").findOne({ _id: petIdObjectId });
+            return updatedPet;
+        }
+    } catch (err) {
+        console.error("Error in updateLostPet():", err);
+        throw err;
+    }
+};
+
 // Function to delete a lost pet record by ID
 async function deleteLostPet(_, { id }) {
     try {
         const db = getDb();
         // Delete pet data from the lostPets collection
-        const result = await db.collection("lostPets").deleteOne({ _id: new require('mongodb').ObjectId(id) });
+        const result = await db.collection("lostPets").deleteOne({ _id: new ObjectId(id) });
 
         if (result.deletedCount === 0) {
             console.log("No lostPet found with the given ID.");
@@ -133,5 +186,7 @@ module.exports = {
     insertPetImg,
     getLostPets,
     getLostPetsByUser,
+    getLostPetDetails,
+    updateLostPet,
     deleteLostPet
 };

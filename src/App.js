@@ -18,6 +18,7 @@ import SuccessStoriesForm from "./components/SuccessStoriesForm";
 import Adminprofile from "./components/Adminprofile";
 import AdoptFormEdit from "./components/AdoptionFormEdit";
 import SearchResults from "./components/SearchResults";
+import LostPetFormEdit from "./components/LostPetFormEdit";
 
 function App() {
   const location = useLocation();
@@ -47,6 +48,7 @@ function App() {
         <Route path="adminprofile" element={<Adminprofile />} />
         <Route path="/edit-pet/:petId" element={<AdoptFormEdit />} />
         <Route path="/search" element={<SearchResults />} />{" "}
+        <Route path="/edit-lost-pet/:petId" element={<LostPetFormEdit />} />
       </Routes>
       {!isLoginPage && <Footer />}
     </>

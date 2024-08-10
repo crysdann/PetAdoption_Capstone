@@ -616,13 +616,13 @@ const UserProfile = () => {
                                 pet.last_seen_date
                               ).toLocaleDateString()}
                             </h3>
-                            <div className="flex justify-start mt-4 space-x-4">
-                              <a
-                                href="LostPetForm"
+                            <div className="flex justify-start mt-4 space-x-2">
+                              <Link
+                                to={`/edit-lost-pet/${pet._id}`}
                                 className="inline-block rounded text-sm bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
                               >
                                 Edit
-                              </a>
+                              </Link>
                               <button
                                 type="button"
                                 onClick={() => handleLostPetDelete(pet._id)}

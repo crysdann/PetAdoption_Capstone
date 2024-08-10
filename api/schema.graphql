@@ -112,7 +112,17 @@ input LostPetInput {
   contact_email: String!
   additional_info: String
 }
-
+input LostPetUpdateInput {
+  pet_name: String
+  pet_type: String
+  pet_breed: String
+  last_seen_location: String
+  last_seen_date: String
+  contact_name: String
+  contact_phone: String
+  contact_email: String
+  additional_info: String
+}
 type Query {
   getAllPets: [Pet]
   getAllPetsByUser(user_id: ID!): [Pet]
@@ -122,6 +132,7 @@ type Query {
   getLostPetsByUser(user_id: ID!): [LostPet]
   getUserDetails(_id: ID!): User
   getPetDetails(petId: ID!): Pet!
+  getLostPetDetails(petId: ID!): LostPet!
   searchSuccessStories(searchQuery: String!): [SuccessStory]
   searchAdoptPets(searchQuery: String!): [Pet]
 }
@@ -139,5 +150,6 @@ type Mutation {
 
   updateUserDetails(_id: ID!, first_name: String!, last_name: String!, email: String!, phone: String!, password: String!): User!
   deleteSuccessStory(id: ID!): Boolean!
+  updateLostPet(id: ID!, input: LostPetUpdateInput!): LostPet!
   deleteLostPet(id: ID!): Boolean!
 }

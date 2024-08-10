@@ -14,6 +14,8 @@ const {
   insertPetImg,
   getLostPets,
   getLostPetsByUser,
+  getLostPetDetails,
+  updateLostPet,
   deleteLostPet,
 } = require("./lostpets.js");
 const {
@@ -38,6 +40,7 @@ const resolvers = {
     getAllPetsByUser: getAllPetsByUser,
     getLostPets: getLostPets,
     getLostPetsByUser: getLostPetsByUser,
+    getLostPetDetails: getLostPetDetails,
     getSuccessStories: getSuccessStories,
     getSuccessStoriesByUser: getSuccessStoriesByUser,
     getUserDetails: getUserDetails,
@@ -60,6 +63,7 @@ const resolvers = {
     updateUserDetails: updateUserDetails,
     deleteSuccessStory: deleteSuccessStory,
     deleteLostPet: deleteLostPet,
+    updateLostPet: updateLostPet,
   },
 };
 
