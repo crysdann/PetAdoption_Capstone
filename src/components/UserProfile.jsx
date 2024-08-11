@@ -673,12 +673,7 @@ const UserProfile = () => {
                             <strong>Description:</strong> {story.description}
                           </p>
                           <div className="flex justify-start mt-4 space-x-4">
-                            <a
-                              href="successstoryform"
-                              className="inline-block rounded text-sm bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
-                            >
-                              Edit
-                            </a>
+
                             <button
                               type="button"
                               onClick={() => handleSuccessStoryDelete(story.id)}
