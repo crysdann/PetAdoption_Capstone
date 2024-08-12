@@ -9,6 +9,7 @@ const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate(); // Get navigate function from useNavigate
+  const [showPassword, setShowPassword] = useState(false); // State to manage password visibility
 
   useEffect(() => {
     function createSnowflake() {
@@ -92,7 +93,7 @@ const Login = () => {
               </div>
               <p className="text-red-500">{errors.email?.message}</p>
             </div>
-            <div>
+            {/* <div>
               <label htmlFor="password" className="sr-only">Password</label>
               <div className="relative">
                 <input
@@ -109,6 +110,38 @@ const Login = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
+                </span>
+              </div>
+              <p className="text-red-500">{errors.password?.message}</p>
+            </div> */}
+
+            <div>
+              <label htmlFor="password" className="sr-only">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"} // Toggle between text and password
+                  className={`w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm custom-input input-white-focus ${errors.password ? 'border-red-500' : ''}`}
+                  placeholder="Enter password"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: { value: 6, message: "Password must be at least 6 characters" }
+                  })}
+                />
+                <span
+                  className="absolute inset-y-0 end-0 grid place-content-center px-4 cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
+                >
+                  {showPassword ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A9 9 0 1121 12h-3M7.29 12.71a9 9 0 0111.94 0" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15V12" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
                 </span>
               </div>
               <p className="text-red-500">{errors.password?.message}</p>

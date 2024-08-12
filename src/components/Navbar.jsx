@@ -36,6 +36,8 @@ const Navbar = () => {
     setIsLoggedIn(false);
     setUserType("");
     setProfileDropdown(false);
+    navigate("/");
+
   };
 
   const handleSearchSubmit = (e) => {
@@ -94,19 +96,13 @@ const Navbar = () => {
               Success Stories
             </Link>
           </li>
-          {isLoggedIn ? (
-            <li
-              className="p-4 text-lg cursor-pointer hover:text-primary-brown"
-              onClick={handleLogout}>
-              Logout
-            </li>
-          ) : (
+          {!isLoggedIn ? (
             <li className="p-4 text-lg">
               <Link to="/login" className="hover:text-primary-brown">
                 Login
               </Link>
             </li>
-          )}
+          ) : null}
         </ul>
         <div className="flex items-center p-4 space-x-4 ml-auto sm:ml-0">
           <div className="sm:hidden">
@@ -135,19 +131,14 @@ const Navbar = () => {
               <Link to="/successstories">Success Stories</Link>
             </li>
             <li className="p-4 text-2xl py-8" onClick={handleNav}>
-              {isLoggedIn ? (
-                <li
-                  className="p-4 text-2xl cursor-pointer hover:text-primary-brown"
-                  onClick={handleLogout}>
-                  Logout
-                </li>
-              ) : (
-                <li className="p-4 text-2xl">
-                  <Link to="/login" className="hover:text-primary-brown">
-                    Login
-                  </Link>
-                </li>
-              )}
+              {!isLoggedIn ? (
+            <li className="p-4 text-2xl">
+              <Link to="/login" className="hover:text-primary-brown">
+                Login
+              </Link>
+            </li>
+          ) : null}
+
             </li>
           </ul>
         </div>

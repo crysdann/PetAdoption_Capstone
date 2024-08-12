@@ -3,6 +3,7 @@ import Adminimage from "../assets/images/admin.png";
 import Admincover from "../assets/images/admincover.jpg";
 import "../index.css";
 import graphQLFetch from '../graphQLFetch';
+import { Link } from 'react-router-dom';
 
 // Function to fetch user details using GraphQL
 const fetchUserDetails = async (userId) => {
@@ -20,33 +21,7 @@ const fetchUserDetails = async (userId) => {
     }
   `;
   const result = await graphQLFetch(query);
-  console.log("Fetched user details:", result);
   return result ? result.getUserDetails : null;
-};
-
-// Function to update user details using GraphQL
-const updateUserDetails = async (userDetails) => {
-  const mutation = `
-    mutation {
-      updateUserDetails(
-        _id: "${userDetails._id}"
-        first_name: "${userDetails.first_name}"
-        last_name: "${userDetails.last_name}"
-        email: "${userDetails.email}"
-        phone: "${userDetails.phone}"
-      ) {
-        _id
-        first_name
-        last_name
-        email
-        phone
-        user_type
-      }
-    }
-  `;
-  const result = await graphQLFetch(mutation);
-  console.log("Updated user details:", result);
-  return result ? result.updateUserDetails : null;
 };
 
 const Adminprofile = () => {
@@ -60,7 +35,7 @@ const Adminprofile = () => {
       if (userId) {
         const userData = await fetchUserDetails(userId);
         setUserDetails(userData);
-        setEditDetails(userData);
+        setEditDetails({ ...userData, userId: userData._id }); 
       }
     };
     fetchData();
@@ -71,13 +46,97 @@ const Adminprofile = () => {
     setEditDetails({ ...editDetails, [name]: value });
   };
 
-  const handleSave = async () => {
-    const updatedUser = await updateUserDetails(editDetails);
-    if (updatedUser) {
-      setUserDetails(updatedUser);
+// Function to update admin details using GraphQL
+const updateAdminDetails = async (editDetails) => {
+  const mutation = `
+    mutation {
+      updateAdminDetails(admin: {
+        _id: "${editDetails.userId}",  
+        first_name: "${editDetails.first_name}",
+        last_name: "${editDetails.last_name}",
+        email: "${editDetails.email}",
+        phone: "${editDetails.phone}",
+      }) {
+        _id
+        first_name
+        last_name
+        email
+        phone
+      }
+    }
+  `;
+  console.log(mutation)
+  const result = await graphQLFetch(mutation);
+  console.log('Mutation result:', result); // Log the result to debug
+  
+  if (result && result.updateAdminDetails) {
+    alert("Admin details successfully updated.");
+    return result.updateAdminDetails;
+  } else {
+    console.error("Failed to update admin data.", result);
+    alert("Failed to update admin data.");
+    return null;
+  }
+};
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();  // Prevents default form submission behavior
+    if (editDetails) {
+      const updatedAdmin = await updateAdminDetails(editDetails);
+      if (updatedAdmin) {
+        setUserDetails(updatedAdmin);  // Update the userDetails with the updated data
+        setActiveTab("Profile");  // Switch back to the Profile tab after save
+      }
+    }
+  };
+
+  //update Admin password
+  const updateAdminPassword = async (userId, oldPassword, newPassword) => {
+    const mutation = `
+      mutation {
+        updateAdminPassword(input:{
+          userId: "${userId}", 
+          oldPassword: "${oldPassword}", 
+          newPassword: "${newPassword}"
+      }) 
+    }
+    `;
+    const result = await graphQLFetch(mutation);
+    return result && result.updateAdminPassword ? result.updateAdminPassword : null;
+  };
+  
+  const [passwordDetails, setPasswordDetails] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
+  });
+  
+  const handlePasswordInputChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordDetails({ ...passwordDetails, [name]: value });
+  };
+  
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    const userId = localStorage.getItem('user_id');
+    
+    if (passwordDetails.newPassword !== passwordDetails.confirmNewPassword) {
+      alert("New password and confirm password do not match.");
+      return;
+    }
+  
+    const result = await updateAdminPassword(userId, passwordDetails.oldPassword, passwordDetails.newPassword);
+    console.log("result",result);
+    if (result) {
+      alert("Password successfully changed.");
+      setPasswordDetails({
+        oldPassword: "",
+        newPassword: "",
+        confirmNewPassword: "",
+      });
       setActiveTab("Profile");
     } else {
-      console.error("Failed to update user details");
+      alert("Failed to change password. Please check your old password.");
     }
   };
 
@@ -85,56 +144,74 @@ const Adminprofile = () => {
     switch (activeTab) {
       case "Change Password":
         return (
-          <div>
-            <form className="w-full max-w-sm">
-              <dl className="text-gray-900 divide-y divide-gray-10 dark:text-white dt-text">
-                <div className="flex flex-col pb-3">
-                  <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Old Password</dt>
-                  <dd className="text-lg font-semibold">{userDetails.password}</dd>
-                </div>
-                <div className="flex flex-col py-3">
-                  <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">New Password</dt>
-                  <dd className="text-lg font-semibold">*************</dd>
-                </div>
-                <div className="flex flex-col py-3">
-                  <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Confirm New Password</dt>
-                  <dd className="text-lg font-semibold">*************</dd>
-                </div>
-              </dl>
-              <div className="flex items-center justify-between">
-                <button className="mt-8 inline-block rounded bg-primary-brown px-12 py-3 text-sm font-medium text-white focus:outline-none focus:ring" type="button">
-                  Change Password
-                </button>
+          <form onSubmit={handlePasswordChange}>
+            <dl className="text-gray-900 divide-y divide-gray-10 dark:text-white dt-text">
+              <div className="flex flex-col pb-3">
+                <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Current Password</dt>
+                <input
+                  type="password"
+                  name="oldPassword"
+                  value={passwordDetails.oldPassword}
+                  onChange={handlePasswordInputChange}
+                  className="text-lg font-semibold  rounded px-2 py-1"
+                />
               </div>
-            </form>
-          </div>
-        );
-
-      case "Profile":
-        return userDetails ? (
-          <dl className="text-gray-900 divide-y divide-gray-10 dark:text-white dt-text">
-            <div className="flex flex-col pb-3">
-              <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">First Name</dt>
-              <dd className="text-lg font-semibold">{userDetails.first_name}</dd>
+              <div className="flex flex-col py-3">
+                <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">New Password</dt>
+                <input
+                  type="password"
+                  name="newPassword"
+                  value={passwordDetails.newPassword}
+                  onChange={handlePasswordInputChange}
+                  className="text-lg font-semibold  rounded px-2 py-1"
+                />
+              </div>
+              <div className="flex flex-col py-3">
+                <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Confirm New Password</dt>
+                <input
+                  type="password"
+                  name="confirmNewPassword"
+                  value={passwordDetails.confirmNewPassword}
+                  onChange={handlePasswordInputChange}
+                  className="text-lg font-semibold  rounded px-2 py-1"
+                />
+              </div>
+            </dl>
+            <div className="flex items-center justify-between">
+              <button
+                type="submit"
+                className="mt-8 inline-block rounded bg-primary-brown px-12 py-3 text-sm font-medium text-white focus:outline-none focus:ring"
+              >
+                Change Password
+              </button>
             </div>
-            <div className="flex flex-col py-3">
-              <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Last Name</dt>
-              <dd className="text-lg font-semibold">{userDetails.last_name}</dd>
-            </div>
-            <div className="flex flex-col py-3">
-              <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Email</dt>
-              <dd className="text-lg font-semibold">{userDetails.email}</dd>
-            </div>
-            <div className="flex flex-col py-3">
-              <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Phone Number</dt>
-              <dd className="text-lg font-semibold">{userDetails.phone}</dd>
-            </div>
-          </dl>
-        ) : <p>Loading...</p>;
+          </form>
+        );        
+        case "Profile":
+          return userDetails ? (
+            <dl className="text-gray-900 divide-y divide-gray-10 dark:text-white dt-text">
+              <div className="flex flex-col pb-3">
+                <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">First Name</dt>
+                <dd className="text-lg font-semibold">{userDetails.first_name}</dd>
+              </div>
+              <div className="flex flex-col py-3">
+                <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Last Name</dt>
+                <dd className="text-lg font-semibold">{userDetails.last_name}</dd>
+              </div>
+              <div className="flex flex-col py-3">
+                <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Email</dt>
+                <dd className="text-lg font-semibold">{userDetails.email}</dd>
+              </div>
+              <div className="flex flex-col py-3">
+                <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Phone Number</dt>
+                <dd className="text-lg font-semibold">{userDetails.phone}</dd>
+              </div>
+            </dl>
+          ) : <p>Loading...</p>;
 
       case "Edit Profile":
         return editDetails ? (
-          <form>
+          <form onSubmit={handleSubmit}>
             <dl className="text-gray-900 divide-y divide-gray-10 dark:text-white dt-text">
               <div className="flex flex-col pb-3">
                 <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">First Name</dt>
@@ -179,8 +256,7 @@ const Adminprofile = () => {
             </dl>
             <div className="flex items-center justify-between">
               <button
-                type="button"
-                onClick={handleSave}
+                type="submit"
                 className="mt-8 inline-block rounded bg-primary-brown px-12 py-3 text-sm font-medium text-white focus:outline-none focus:ring"
               >
                 Save
@@ -216,34 +292,42 @@ const Adminprofile = () => {
           <div className="flex flex-col sm:flex-row w-full h-full">
             <div className="w-full sm:w-2/3 h-full">{renderContent()}</div>
             <div className="w-full sm:w-1/3 h-full">
-              <div className="text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white h-full p-4">
-                <a
-                  href="#"
-                  onClick={() => setActiveTab("Profile")}
-                  className={`block w-full px-4 py-3 border-b border-gray-200 cursor-pointer ${
-                    activeTab === "Profile" ? "text-white bg-primary-brown dark:bg-gray-800" : "hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                  }`}
-                >
-                  Profile
-                </a>
-                <a
-                  href="#"
-                  onClick={() => setActiveTab("Edit Profile")}
-                  className={`block w-full px-4 py-3 border-b border-gray-200 cursor-pointer ${
-                    activeTab === "Edit Profile" ? "text-white bg-primary-brown dark:bg-gray-800" : "hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                  }`}
-                >
-                  Edit Profile
-                </a>
-                <a
-                  href="#"
-                  onClick={() => setActiveTab("Change Password")}
-                  className={`block w-full px-4 py-3 border-b border-gray-200 cursor-pointer ${
-                    activeTab === "Change Password" ? "text-white bg-primary-brown dark:bg-gray-800" : "hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                  }`}
-                >
-                  Change Password
-                </a>
+              <div className="text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg  dark:border-gray-600 dark:text-white h-full p-4">
+
+                <Link
+                    to="#"
+                    onClick={() => setActiveTab("Profile")}
+                    className={`block w-full px-4 py-3 border-b border-gray-200 cursor-pointer ${
+                      activeTab === "Profile"
+                        ? "text-white bg-primary-brown dark:bg-primary-brown"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                    }`}
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    to="#"
+                    onClick={() => setActiveTab("Edit Profile")}
+                    className={`block w-full px-4 py-3 border-b border-gray-200 cursor-pointer ${
+                      activeTab === "Edit Profile"
+                        ? "text-white bg-primary-brown dark:bg-primary-brown"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                    }`}
+                  >
+                    Edit Profile
+                  </Link>
+                  <Link
+                    to="#"
+                    onClick={() => setActiveTab("Change Password")}
+                    className={`block w-full px-4 py-3 border-b border-gray-200 cursor-pointer ${
+                      activeTab === "Change Password"
+                        ? "text-white bg-primary-brown dark:bg-primary-brown"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                    }`}
+                  >
+                    Change Password
+                  </Link>
+
               </div>
             </div>
           </div>
@@ -254,3 +338,5 @@ const Adminprofile = () => {
 };
 
 export default Adminprofile;
+
+

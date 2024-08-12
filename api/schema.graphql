@@ -123,6 +123,30 @@ input LostPetUpdateInput {
   contact_email: String
   additional_info: String
 }
+
+type Admin {
+  _id: ID!
+  first_name: String!
+  last_name: String!
+  email: String!
+  phone: String!
+  userType: String!
+}
+
+input AdminInput {
+  _id: ID!
+  first_name: String!
+  last_name: String!
+  email: String!
+  phone: String!
+}
+
+input updateAdminPasswordInput {
+  userId: ID!
+  oldPassword: String!
+  newPassword: String!
+}
+
 type Query {
   getAllPets: [Pet]
   getAllPetsByUser(user_id: ID!): [Pet]
@@ -147,9 +171,9 @@ type Mutation {
   loginUser(email: String!, password: String!): User!
   updatePet(id: ID!, pet: petUpdateInput!): Pet!
   adoptPetDelete(id: ID!): Boolean!
-
-  updateUserDetails(_id: ID!, first_name: String!, last_name: String!, email: String!, phone: String!, password: String!): User!
   deleteSuccessStory(id: ID!): Boolean!
   updateLostPet(id: ID!, input: LostPetUpdateInput!): LostPet!
   deleteLostPet(id: ID!): Boolean!
+  updateAdminPassword(input: updateAdminPasswordInput!): Boolean!
+  updateAdminDetails(admin: AdminInput!): Admin!
 }

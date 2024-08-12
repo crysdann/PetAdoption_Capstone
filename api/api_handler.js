@@ -22,7 +22,8 @@ const {
   createUser,
   loginUser,
   getUserDetails,
-  updateUserDetails,
+  updateAdminDetails,
+  updateAdminPassword,
 } = require("./users.js");
 const {
   createSuccessStory,
@@ -60,10 +61,13 @@ const resolvers = {
     loginUser: loginUser,
     updatePet: updatePet,
     adoptPetDelete: adoptPetDelete,
-    updateUserDetails: updateUserDetails,
     deleteSuccessStory: deleteSuccessStory,
     deleteLostPet: deleteLostPet,
     updateLostPet: updateLostPet,
+    updateAdminDetails: updateAdminDetails,
+    updateAdminPassword:updateAdminPassword,
+
+
   },
 };
 
