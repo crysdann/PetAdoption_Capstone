@@ -3,7 +3,9 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import Sign_in1 from "../assets/images/signin_img.jpg";
 import graphQLFetch from "../graphQLFetch";
-import "../style.css"; 
+import "../style.css";
+import { Link } from "react-router-dom";
+
 
 const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -33,7 +35,7 @@ const Login = () => {
   const onSubmit = async (data) => {
     console.log("Form submitted", data);
     setErrorMessage('');
-    
+
     try {
       const query = `
         mutation {
@@ -49,7 +51,7 @@ const Login = () => {
 
       if (result) {
         // Redirect or perform actions upon successful login
-        localStorage.setItem('user_id', result.loginUser._id); 
+        localStorage.setItem('user_id', result.loginUser._id);
         localStorage.setItem('user_type', result.loginUser.user_type);
         navigate('/');
       } else {
@@ -154,7 +156,12 @@ const Login = () => {
               </div>
               <div className="w-full text-center sm:w-auto">
                 <p className="text-sm text-gray-500">No account?&nbsp;
-                  <a className="underline" href="Signup">Sign up</a>
+                  <Link
+                    to="/signup"
+                    className="underline"
+                  >
+                    Sign up
+                  </Link>
                 </p>
               </div>
             </div>

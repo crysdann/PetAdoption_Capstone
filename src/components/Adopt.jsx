@@ -36,19 +36,13 @@ function Banner() {
           </p>
 
           <div className="mt-8 flex justify-center gap-4 ">
-            <a
-              href="/adoptdataform"
+
+            <Link
+              to="/adoptdataform"
               className="block w-full rounded bg-rose-600 px-12 py-3 text-sm font-medium text-white shadow hover:bg-rose-700 focus:outline-none focus:ring active:bg-rose-500 sm:w-auto"
             >
               Add to Adoption
-            </a>
-
-            {/* <a
-              href="#"
-              className="block w-full rounded bg-white px-12 py-3 text-sm font-medium text-rose-600 shadow hover:text-rose-700 focus:outline-none focus:ring active:text-rose-500 sm:w-auto"
-            >
-              Learn More
-            </a> */}
+            </Link>
           </div>
         </div>
       </div>
@@ -111,66 +105,66 @@ function FilterPets() {
       </div>
     );
   }
-  
-    return (
-      <div className="container mx-auto mt-8 flex justify-center">
-        <div className="flex flex-wrap -m-2 justify-center w-7/12">
-          <div className="w-1/2 md:w-1/4 p-2">
-            <Link
-              to="/adopt/all"
-              className="block p-4 shadow text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
-            >
-              <img
-                src={allPetImg}
-                alt="icon_petImage"
-                style={{ width: "4rem" }}
-              ></img>
-              <span className="mt-1 font-bold">All Pets</span>
-            </Link>
-          </div>
-          <div className="w-1/2 md:w-1/4 p-2">
-            <Link
-              to="/adopt/dog"
-              className="block p-6 shadow  text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
-            >
-              <img
-                src={dogImg}
-                alt="icon_petImage"
-                style={{ width: "4rem" }}
-              ></img>
-              <span className="font-bold">Dogs</span>
-            </Link>
-          </div>
-          <div className="w-1/2 md:w-1/4 p-2">
-            <Link
-              to="/adopt/cat"
-              className="block p-6 shadow  text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
-            >
-              <img
-                src={catImg}
-                alt="icon_petImage"
-                style={{ width: "4rem" }}
-              ></img>
-              <span className="font-bold">Cats</span>
-            </Link>
-          </div>
-          <div className="w-1/2 md:w-1/4 p-2">
-            <Link
-              to="/adopt/other"
-              className="block p-6 shadow  text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
-            >
-              <img
-                src={otherPetImg}
-                alt="icon_petImage"
-                style={{ width: "4rem" }}
-              ></img>
-              <span className="font-bold">Others</span>
-            </Link>
-          </div>
+
+  return (
+    <div className="container mx-auto mt-8 flex justify-center">
+      <div className="flex flex-wrap -m-2 justify-center w-7/12">
+        <div className="w-1/2 md:w-1/4 p-2">
+          <Link
+            to="/adopt/all"
+            className="block p-4 shadow text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
+          >
+            <img
+              src={allPetImg}
+              alt="icon_petImage"
+              style={{ width: "4rem" }}
+            ></img>
+            <span className="mt-1 font-bold">All Pets</span>
+          </Link>
+        </div>
+        <div className="w-1/2 md:w-1/4 p-2">
+          <Link
+            to="/adopt/dog"
+            className="block p-6 shadow  text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
+          >
+            <img
+              src={dogImg}
+              alt="icon_petImage"
+              style={{ width: "4rem" }}
+            ></img>
+            <span className="font-bold">Dogs</span>
+          </Link>
+        </div>
+        <div className="w-1/2 md:w-1/4 p-2">
+          <Link
+            to="/adopt/cat"
+            className="block p-6 shadow  text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
+          >
+            <img
+              src={catImg}
+              alt="icon_petImage"
+              style={{ width: "4rem" }}
+            ></img>
+            <span className="font-bold">Cats</span>
+          </Link>
+        </div>
+        <div className="w-1/2 md:w-1/4 p-2">
+          <Link
+            to="/adopt/other"
+            className="block p-6 shadow  text-dark rounded-lg border-2 border-white hover:border-black transition h-full flex flex-col items-center"
+          >
+            <img
+              src={otherPetImg}
+              alt="icon_petImage"
+              style={{ width: "4rem" }}
+            ></img>
+            <span className="font-bold">Others</span>
+          </Link>
         </div>
       </div>
-    );
-  
+    </div>
+  );
+
 }
 
 const PetCard = ({ pet }) => {
@@ -312,12 +306,11 @@ const AdoptionList = () => {
   }, [filter]);
 
   useEffect(() => {
-    if(filter)
-       navigate(`/adopt/${filter}`);
+    if (filter)
+      navigate(`/adopt/${filter}`);
   }, [filter, navigate]);
 
-  if(filteredPets.length > 0)
-  {
+  if (filteredPets.length > 0) {
     return (
       <div className="pt-[9.1rem] pb-[2rem]">
         <Banner />
@@ -328,8 +321,7 @@ const AdoptionList = () => {
       </div>
     );
   }
-  else
-  {
+  else {
     return (
       <div className="pt-[9.1rem] pb-[2rem]">
         <Banner />
@@ -342,6 +334,6 @@ const AdoptionList = () => {
       </div>
     );
   }
-  
+
 };
 export default AdoptionList;

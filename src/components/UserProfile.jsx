@@ -647,12 +647,12 @@ const UserProfile = () => {
                     <p className="text-lg text-gray-700 mr-3">
                       Want to share your success story...
                     </p>
-                    <a
-                      href="successstoriesform"
+                    <Link
+                      to="/successstoriesform"
                       className="inline-block rounded text-lg bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
                     >
                       Share Your Story
-                    </a>
+                    </Link>
                   </div>
                   {successStories.length > 0 ? (
                     <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">

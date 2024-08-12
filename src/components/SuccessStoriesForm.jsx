@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import graphQLFetch from "../graphQLFetch";
 import firebase from "firebase/compat/app";
 import "firebase/compat/storage";
+import { Link } from "react-router-dom";
 
 const SuccessStoriesForm = () => {
   const [petName, setPetName] = useState("");
@@ -139,9 +140,12 @@ const SuccessStoriesForm = () => {
           <p className="text-red-500 text-xl">
             Please login to submit your success story.
           </p>
-          <a href="/login" className="text-blue-500 underline">
+          <Link
+            to="/login"
+            className="text-blue-500 underline"
+          >
             Click here to login
-          </a>
+          </Link>
         </div>
       )}
     </div>
