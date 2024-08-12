@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/PetAdoption_Capstone/static/css/main.58827646.css",
+    "main.js": "/PetAdoption_Capstone/static/js/main.6b75639a.js",
+    "static/media/signin_img.jpg": "/PetAdoption_Capstone/static/media/signin_img.391f2b563d191fe17df8.jpg",
+    "static/media/home_images.jpg": "/PetAdoption_Capstone/static/media/home_images.c71a5e88510f857923cc.jpg",
+    "static/media/register.jpg": "/PetAdoption_Capstone/static/media/register.4344a4d267e832e4974e.jpg",
+    "static/media/banner_img.jpg": "/PetAdoption_Capstone/static/media/banner_img.e53212e21e4c4effc144.jpg",
+    "static/media/listbanner.jpg": "/PetAdoption_Capstone/static/media/listbanner.5805ed9571c0a7670016.jpg",
+    "static/media/successstorieshero.jpg": "/PetAdoption_Capstone/static/media/successstorieshero.7c479bbd7dd5e8ae8768.jpg",
+    "static/media/home_main.jpg": "/PetAdoption_Capstone/static/media/home_main.5a05edf8276920d75129.jpg",
+    "static/media/admincover.jpg": "/PetAdoption_Capstone/static/media/admincover.9c73990a69a8481ac8ee.jpg",
+    "static/media/test.jpg": "/PetAdoption_Capstone/static/media/test.d7ebc91a51513b64c58d.jpg",
+    "static/media/petconnectlogo.png": "/PetAdoption_Capstone/static/media/petconnectlogo.02638c591a47cbd3d2da.png",
+    "static/media/cat_footer.jpg": "/PetAdoption_Capstone/static/media/cat_footer.f5c8dd988cd9a6afef14.jpg",
+    "static/media/pet2.jpg": "/PetAdoption_Capstone/static/media/pet2.e3c5cba9d5686287c573.jpg",
+    "static/media/admin.png": "/PetAdoption_Capstone/static/media/admin.456d05ddde6b14f1ccfd.png",
+    "index.html": "/PetAdoption_Capstone/index.html",
+    "main.58827646.css.map": "/PetAdoption_Capstone/static/css/main.58827646.css.map",
+    "main.6b75639a.js.map": "/PetAdoption_Capstone/static/js/main.6b75639a.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.58827646.css",
+    "static/js/main.6b75639a.js"
+  ]
+}
