@@ -19,11 +19,9 @@ const SearchResults = () => {
             id
             petName
             description
-            petPhotoUrl
           }
           searchAdoptPets(searchQuery: $searchQuery) {
             pet_name
-            pet_image
             pet_type
             pet_age
             pet_gender
@@ -37,19 +35,9 @@ const SearchResults = () => {
       try {
         const result = await graphQLFetch(searchQueryText, variables);
         if (result) {
-          const adoptPetsWithFirstImage = (result.searchAdoptPets || []).map(
-            (pet) => ({
-              ...pet,
-              pet_image:
-                pet.pet_image && pet.pet_image.length > 0
-                  ? pet.pet_image[0]
-                  : null,
-            })
-          );
-
           const combinedResults = [
             ...(result.searchSuccessStories || []),
-            ...adoptPetsWithFirstImage,
+            ...(result.searchAdoptPets || []),
           ];
 
           setResults(combinedResults);
@@ -76,23 +64,7 @@ const SearchResults = () => {
             <div
               key={index}
               className="result-box flex bg-white p-4 rounded-lg shadow-md">
-              <div className="image-column w-1/3">
-                {item.petPhotoUrl && (
-                  <img
-                    src={item.petPhotoUrl}
-                    alt={item.petName}
-                    className="w-full h-auto object-cover rounded-lg"
-                  />
-                )}
-                {item.pet_image && (
-                  <img
-                    src={item.pet_image}
-                    alt={item.pet_name}
-                    className="w-full h-auto object-cover rounded-lg"
-                  />
-                )}
-              </div>
-              <div className="text-column w-2/3 pl-4">
+              <div className="text-column w-full">
                 <h2 className="text-xl font-bold">
                   {item.petName || item.pet_name}
                 </h2>
