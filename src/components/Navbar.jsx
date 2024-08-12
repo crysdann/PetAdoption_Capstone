@@ -119,9 +119,8 @@ const Navbar = () => {
         </div>
         {/* Mobile Menu */}
         <div
-          className={`${
-            nav ? "left-0" : "left-[-100%]"
-          } overflow-y-hidden md:hidden ease-in duration-300 absolute text-gray-300 top-0 w-full h-screen bg-black/90 py-7 flex flex-col`}>
+          className={`${nav ? "left-0" : "left-[-100%]"
+            } overflow-y-hidden md:hidden ease-in duration-300 absolute text-gray-300 top-0 w-full h-screen bg-black/90 py-7 flex flex-col`}>
           <ul className="h-full w-full text-center pt-12">
             <li className="p-4 text-2xl py-8" onClick={handleNav}>
               <Link to="/">Home</Link>
@@ -136,7 +135,19 @@ const Navbar = () => {
               <Link to="/successstories">Success Stories</Link>
             </li>
             <li className="p-4 text-2xl py-8" onClick={handleNav}>
-              <Link to="/login"> Login </Link>
+              {isLoggedIn ? (
+                <li
+                  className="p-4 text-2xl cursor-pointer hover:text-primary-brown"
+                  onClick={handleLogout}>
+                  Logout
+                </li>
+              ) : (
+                <li className="p-4 text-2xl">
+                  <Link to="/login" className="hover:text-primary-brown">
+                    Login
+                  </Link>
+                </li>
+              )}
             </li>
           </ul>
         </div>
@@ -171,9 +182,7 @@ const Navbar = () => {
                 onClick={handleProfileClick}>
                 Profile
               </li>
-              <li className="p-[10px] border-b border-white hover:text-primary-white cursor-pointer">
-                Settings
-              </li>
+
               <li
                 className="p-[10px] hover:text-primary-white cursor-pointer"
                 onClick={handleLogout}>
