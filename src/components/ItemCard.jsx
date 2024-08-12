@@ -10,14 +10,16 @@ const ItemCard = ({ item }) => {
   const isAdoptPet = item.pet_name !== undefined;
   console.log(`isAdoptPet: ${isAdoptPet}`);
   console.log(`pet_name: ${item.pet_name}`);
-  console.log(`pet_image: ${item.pet_image}`);
+
   return (
     <div className="item-card">
-      <img
-        src={isAdoptPet ? item.pet_image : item.petPhotoUrl}
-        alt={isAdoptPet ? item.pet_name : item.petName}
-        className="item-image"
-      />
+      {/* Conditionally render image if available */}
+      {isAdoptPet && item.pet_image && (
+        <img src={item.pet_image} alt={item.pet_name} className="item-image" />
+      )}
+      {!isAdoptPet && item.petPhotoUrl && (
+        <img src={item.petPhotoUrl} alt={item.petName} className="item-image" />
+      )}
       <h2 className="item-name">{isAdoptPet ? item.pet_name : item.petName}</h2>
       <p className="item-description">
         {isAdoptPet ? item.pet_description : item.description}
