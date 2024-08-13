@@ -13,6 +13,7 @@ import graphQLFetch from "../graphQLFetch";
 import ReactPaginate from "react-paginate";
 
 function Banner() {
+  const userType = localStorage.getItem("user_type");
   return (
     <section
       style={{ backgroundImage: `url(${bannerImage})` }}
@@ -36,13 +37,14 @@ function Banner() {
           </p>
 
           <div className="mt-8 flex justify-center gap-4 ">
-
+          {userType !== "admin" && (
             <Link
               to="/adoptdataform"
               className="block w-full rounded bg-rose-600 px-12 py-3 text-sm font-medium text-white shadow hover:bg-rose-700 focus:outline-none focus:ring active:bg-rose-500 sm:w-auto"
             >
               Add to Adoption
             </Link>
+            )}
           </div>
         </div>
       </div>
@@ -167,8 +169,43 @@ function FilterPets() {
 
 }
 
-const PetCard = ({ pet }) => {
+const PetCard = ({ pet, onDelete }) => {
+
+
   const { pet_name, pet_age, pet_gender, pet_description, pet_image } = pet;
+
+  const userType = localStorage.getItem("user_type");
+
+    // delete feature for adopt
+    const handlePetDelete = async (id) => {
+      const confirmed = window.confirm(
+        "Are you sure you want to delete this pet?"
+      );
+      if (confirmed) {
+        try {
+          // Define the GraphQL mutation query
+          const query = `mutation adoptPetDelete($id: ID!) {
+        adoptPetDelete(id: $id)
+         }`;
+  
+          // Execute the GraphQL mutation to delete the pet
+          const data = await graphQLFetch(query, { id });
+          // Check if the deletion was successful
+          if (data.adoptPetDelete) {
+            alert("Pet deleted successfully");
+            if (onDelete) {
+              onDelete(id); // Call the onDelete callback with the pet ID
+            }
+            // );
+          } else {
+            alert("Error deleting pet, try again");
+          }
+        } catch (error) {
+          console.error("Error deleting pet:", error);
+          alert("Failed to delete pet");
+        }
+      }
+    };
 
   // Use the first image URL if available, otherwise use a placeholder image
   const petImageUrl =
@@ -196,6 +233,15 @@ const PetCard = ({ pet }) => {
         </div>
 
         <div className="sm:flex sm:items-end sm:justify-end">
+          {/* Conditional rendering for admin users */}
+          {userType === "admin" && (
+            <button
+            onClick={() => handlePetDelete(pet._id)}
+            className="inline-block rounded text-sm mb-1 bg-red-500 border-red-600 py-1 px-3 font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring transition duration-200"
+          >
+            Delete
+          </button>
+          )}
           <Link
             to={`/petdetails/${pet._id}`}
             className="block px-5 py-3 text-center text-primary-brown text-xs font-bold uppercase hover:text-rose-600 transition"
@@ -208,7 +254,7 @@ const PetCard = ({ pet }) => {
   );
 };
 
-const Paging = ({ items, itemsPerPage }) => {
+const Paging = ({ items, itemsPerPage, onDelete }) => {
   const [itemOffset, setItemOffset] = useState(0);
 
   const endOffset = itemOffset + itemsPerPage;
@@ -224,7 +270,7 @@ const Paging = ({ items, itemsPerPage }) => {
     <>
       {currentItems.map((pet) => (
         <div key={pet._id} className="rounded-lg m-5">
-          <PetCard pet={pet} />
+          <PetCard pet={pet} onDelete={onDelete}/>
         </div>
       ))}
       <div className="w-full col-span-2 flex justify-center mt-4">
@@ -310,13 +356,17 @@ const AdoptionList = () => {
       navigate(`/adopt/${filter}`);
   }, [filter, navigate]);
 
+  const handleDelete = (id) => {
+    setFilteredPets((prevPets) => prevPets.filter(pet => pet._id !== id));
+  };
+
   if (filteredPets.length > 0) {
     return (
       <div className="pt-[9.1rem] pb-[2rem]">
         <Banner />
         <FilterPets />
         <div className="mx-7 p-5 md:grid md:grid-cols-2 md:gap-8 lg:mx-14">
-          <Paging items={filteredPets} itemsPerPage={itemsPerPage} />
+          <Paging items={filteredPets} itemsPerPage={itemsPerPage} onDelete={handleDelete}/>
         </div>
       </div>
     );
