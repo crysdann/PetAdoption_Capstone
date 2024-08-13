@@ -34,7 +34,7 @@ async function loginUser(_, { email, password }) {
     const user = await db.collection('users').findOne({ email });
 
     if (!user) {
-      throw new Error('Invalid credentials. Please check your email and password.');
+      throw new Error('Invalid credentials. Please check your email and password.Email not found');
     }
 
     // Compare the provided password with the hashed password in the database
