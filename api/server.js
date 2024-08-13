@@ -10,7 +10,7 @@ const app = express();
 
 // Use CORS middleware to allow requests from different origins
 app.use(cors({
-  origin: 'http://localhost:3000' // client’s URL
+  origin: 'https://petconnectcapstone-1cf29.web.app' // client’s URL
 }));
 
 app.use(bodyParser.json());
@@ -29,7 +29,7 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL, // email address
     pass: process.env.PASSWORD, // email password 
   },
-  tls:{
+  tls: {
     rejectUnauthorized: true
   }
 });

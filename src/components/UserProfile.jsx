@@ -506,12 +506,12 @@ const UserProfile = () => {
                     <p className="text-lg text-gray-700 mr-3">
                       Want to post any pets for adoption...
                     </p>
-                    <a
-                      href="adoptdataform"
+                    <Link
+                      to="/adoptdataform"
                       className="inline-block rounded text-lg bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
                     >
                       Add Adoption
-                    </a>
+                    </Link>
                   </div>
                   <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     {adoptionDetails.length > 0 ? (
@@ -579,12 +579,13 @@ const UserProfile = () => {
                     <p className="text-lg text-gray-700 mr-3">
                       Haven't found your pets yet...
                     </p>
-                    <a
-                      href="LostPetForm"
+
+                    <Link
+                      to="/lostpetform"
                       className="inline-block rounded text-lg bg-primary-light-brown border-[#d2c8bc] py-2 px-4 font-medium text-primary-brown shadow hover:bg-primary-brown hover:border-[#866552] hover:text-white focus:outline-none focus:ring transition duration-200"
                     >
                       Add Lost Pet
-                    </a>
+                    </Link>
                   </div>
                   <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     {lostPets.length > 0 ? (
