@@ -41,7 +41,7 @@ async function loginUser(_, { email, password }) {
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
     if (!isPasswordCorrect) {
-      throw new Error('Invalid credentials. Please check your email and password.');
+      throw new Error('Invalid credentials. Please check your email and password. Password not matching');
     }
 
     console.log('User logged in successfully:', user);
