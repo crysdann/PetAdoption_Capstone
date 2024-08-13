@@ -3,8 +3,10 @@ import { useForm } from "react-hook-form";
 import Registerimg from "../assets/images/register.jpg";
 import Pawprint from "../assets/images/pawprintsignup.png";
 import graphQLFetch from "../graphQLFetch";
-import "../style.css";
 import { Link } from "react-router-dom";
+import "../style.css";
+import bcrypt from 'bcryptjs';
+
 
 const Signup = () => {
   const { register, handleSubmit, formState: { errors }, watch, reset } = useForm();
@@ -13,8 +15,10 @@ const Signup = () => {
 
   const onSubmit = async (data) => {
     console.log("Form submitted", data);
-    try {
-      const query = `mutation CreateUser($user: UserInput!) {
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    try{
+    const query = `mutation CreateUser($user: UserInput!) {
       createUser(user: $user) {
         _id
         first_name
@@ -26,18 +30,18 @@ const Signup = () => {
       }
     }`;
 
-      const variables = {
-        user: {
-          first_name: data.first_name,
-          last_name: data.last_name,
-          email: data.email,
-          phone: data.phone,
-          password: data.password,
-          user_type: "regular"
-        }
-      };
+    const variables = {
+      user: {
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        phone: data.phone,
+        password: hashedPassword,
+        user_type: "regular"
+      }
+    };
 
-      const result = await graphQLFetch(query, variables);
+      const result = await graphQLFetch(query,variables);
       console.log('Data inserted', result);
 
       // Clear the form fields
@@ -70,7 +74,7 @@ const Signup = () => {
               <form
                 onSubmit={handleSubmit(onSubmit)}
                 className="mt-16 grid grid-cols-6 gap-5" name="createUser"
-                noValidate
+                noValidate 
               >
                 <div className="col-span-6 sm:col-span-3">
                   <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">First Name</label>
@@ -170,12 +174,7 @@ const Signup = () => {
                 <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                   <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                     Already have an account?&nbsp;&nbsp;
-                    <Link
-                      to="/login"
-                      className="text-gray-700 underline"
-                    >
-                      Log in
-                    </Link>
+                    <Link to="/login" className="text-gray-700 underline"> Login</Link>
                   </p>
                 </div>
               </form>
